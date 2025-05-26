@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Location Test - PetCare Companion</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border: none;
+        }
+        .btn {
+            border-radius: 25px;
+            font-weight: 600;
+        }
+        #result {
+            max-height: 300px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            border: 1px solid #dee2e6;
+        }
+        .result-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .result-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <div class="card">
+                    <div class="card-body">
+                        <h1 class="card-title text-center mb-4">
+                            <i class="fas fa-map-marker-alt me-2 text-primary"></i>
+                            Location Detection Test
+                        </h1>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <button type="button" class="btn btn-primary w-100 mb-3" onclick="testLocation()">
+                                    <i class="fas fa-satellite-dish me-2"></i>Test GPS Location
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                <button type="button" class="btn btn-success w-100 mb-3" onclick="testDemo()">
+                                    <i class="fas fa-map-pin me-2"></i>Test Demo Location
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <button type="button" class="btn btn-warning me-2" onclick="clearResults()">
+                                    <i class="fas fa-trash me-2"></i>Clear Results
+                                </button>
+                                <a href="/nearby-services" class="btn btn-info">
+                                    <i class="fas fa-arrow-left me-2"></i>Back to Nearby Services
+                                </a>
+                            </div>
+                        </div>
+
+                        <div id="status" class="alert alert-info d-none"></div>
+
+                        <div class="mt-3">
+                            <h5><i class="fas fa-list me-2"></i>Test Results:</h5>
+                            <div id="result"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function log(message) {
+            console.log(message);
+            const resultDiv = document.getElementById('result');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'result-item';
+            messageDiv.innerHTML = `<small class="text-muted">${new Date().toLocaleTimeString()}</small> - ${message}`;
+            resultDiv.appendChild(messageDiv);
+
+            // Auto-scroll to bottom
+            resultDiv.scrollTop = resultDiv.scrollHeight;
+        }
+
+        function clearResults() {
+            document.getElementById('result').innerHTML = '';
+            log('🧹 Results cleared');
+        }
+
+        function testLocation() {
+            const statusDiv = document.getElementById('status');
+            const resultDiv = document.getElementById('result');
+
+            resultDiv.innerHTML = '';
+            log('🔍 Testing location detection...');
+
+            // Check if geolocation is supported
+            if (!navigator.geolocation) {
+                log('❌ Geolocation is not supported by this browser');
+                return;
+            }
+
+            log('✅ Geolocation is supported');
+            log('📍 Protocol: ' + location.protocol);
+            log('🌐 Hostname: ' + location.hostname);
+
+            // Show status
+            statusDiv.classList.remove('d-none');
+            statusDiv.innerHTML = '🔄 Getting your location...';
+
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    const accuracy = position.coords.accuracy;
+
+                    statusDiv.classList.add('d-none');
+                    log('🎉 SUCCESS! Location detected:');
+                    log('📍 Latitude: ' + lat);
+                    log('📍 Longitude: ' + lng);
+                    log('🎯 Accuracy: ' + accuracy + ' meters');
+
+                    // Test distance calculation
+                    const koramangalaLat = 12.9352;
+                    const koramangalaLng = 77.6245;
+                    const distance = calculateDistance(lat, lng, koramangalaLat, koramangalaLng);
+                    log('📏 Distance to Koramangala: ' + distance.toFixed(2) + ' km');
+                },
+                function(error) {
+                    statusDiv.classList.add('d-none');
+                    log('❌ ERROR: ' + error.message);
+                    log('🔢 Error code: ' + error.code);
+
+                    switch(error.code) {
+                        case 1:
+                            log('🚫 Permission denied - Please allow location access');
+                            break;
+                        case 2:
+                            log('📡 Position unavailable - Check your connection');
+                            break;
+                        case 3:
+                            log('⏰ Timeout - Location request took too long');
+                            break;
+                    }
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                }
+            );
+        }
+
+        function testDemo() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '';
+
+            log('🧪 Testing demo location...');
+            log('📍 Setting location to Koramangala, Bangalore');
+            log('📍 Latitude: 12.9352');
+            log('📍 Longitude: 77.6245');
+            log('✅ Demo location set successfully!');
+        }
+
+        function calculateDistance(lat1, lng1, lat2, lng2) {
+            const R = 6371; // Earth's radius in km
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLng = (lng2 - lng1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLng/2) * Math.sin(dLng/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+
+        // Test on page load
+        window.onload = function() {
+            log('🚀 Page loaded');
+            log('🔍 Checking browser support...');
+
+            if (navigator.geolocation) {
+                log('✅ Geolocation API is available');
+            } else {
+                log('❌ Geolocation API is not available');
+            }
+        };
+    </script>
+</body>
+</html>

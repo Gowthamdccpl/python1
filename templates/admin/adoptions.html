@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Adoption Applications - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="fas fa-heart me-2"></i>Adoption Applications</h1>
+        <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+        </a>
+    </div>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>{{ adoptions|length }}</h4>
+                            <p class="mb-0">Total Applications</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-heart fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>{{ adoptions|selectattr("application_status", "equalto", "pending")|list|length }}</h4>
+                            <p class="mb-0">Pending</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-clock fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>{{ adoptions|selectattr("application_status", "equalto", "approved")|list|length }}</h4>
+                            <p class="mb-0">Approved</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-check fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-danger text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>{{ adoptions|selectattr("application_status", "equalto", "rejected")|list|length }}</h4>
+                            <p class="mb-0">Rejected</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-times fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Applications Table -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-list me-2"></i>All Adoption Applications</h5>
+        </div>
+        <div class="card-body">
+            {% if adoptions %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Applicant</th>
+                                <th>Pet</th>
+                                <th>Contact</th>
+                                <th>Application Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for adoption in adoptions %}
+                            <tr class="{{ 'table-warning' if not adoption.is_read else '' }}">
+                                <td>{{ adoption.id }}</td>
+                                <td>
+                                    <strong>{{ adoption.applicant_name }}</strong>
+                                    {% if not adoption.is_read %}
+                                    <span class="badge bg-danger ms-1">New</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <strong>{{ adoption.pet_name }}</strong>
+                                </td>
+                                <td>
+                                    <small>
+                                        <i class="fas fa-envelope me-1"></i>{{ adoption.email }}<br>
+                                        <i class="fas fa-phone me-1"></i>{{ adoption.phone }}
+                                    </small>
+                                </td>
+                                <td>{{ adoption.application_date }}</td>
+                                <td>
+                                    <span class="badge bg-{{ 'warning' if adoption.application_status == 'pending' else 'success' if adoption.application_status == 'approved' else 'danger' }}">
+                                        {{ adoption.application_status|title }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="{{ url_for('admin_adoption_details', adoption_id=adoption.id) }}" 
+                                           class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i> View
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                                            Status
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <form method="POST" action="{{ url_for('admin_update_adoption_status', adoption_id=adoption.id) }}" style="display: inline;">
+                                                    <input type="hidden" name="status" value="pending">
+                                                    <button type="submit" class="dropdown-item">
+                                                        <i class="fas fa-clock me-2"></i>Pending
+                                                    </button>
+                                                </form>
+                                            </li>
+                                            <li>
+                                                <form method="POST" action="{{ url_for('admin_update_adoption_status', adoption_id=adoption.id) }}" style="display: inline;">
+                                                    <input type="hidden" name="status" value="approved">
+                                                    <button type="submit" class="dropdown-item">
+                                                        <i class="fas fa-check me-2"></i>Approved
+                                                    </button>
+                                                </form>
+                                            </li>
+                                            <li>
+                                                <form method="POST" action="{{ url_for('admin_update_adoption_status', adoption_id=adoption.id) }}" style="display: inline;">
+                                                    <input type="hidden" name="status" value="rejected">
+                                                    <button type="submit" class="dropdown-item text-danger">
+                                                        <i class="fas fa-times me-2"></i>Rejected
+                                                    </button>
+                                                </form>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-heart-broken fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No adoption applications found</h5>
+                    <p class="text-muted">Applications will appear here when users submit adoption requests.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

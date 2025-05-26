@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block title %}Appointment - PetCare Companion{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4 text-center">Book a Veterinary Appointment</h1>
+
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Schedule Your Pet's Visit</h5>
+
+                    {% if success_message %}
+                    <div class="alert alert-success" role="alert">
+                        {{ success_message }}
+                    </div>
+                    {% endif %}
+
+                    {% if error_message %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ error_message }}
+                    </div>
+                    {% endif %}
+
+                    <form action="{{ url_for('appointment') }}" method="POST">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="owner_name" class="form-label">Your Name</label>
+                                <input type="text" class="form-control" id="owner_name" name="owner_name" value="{{ appointment_data.owner_name if appointment_data else '' }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="email" class="form-label">Email Address</label>
+                                <input type="email" class="form-control" id="email" name="email" value="{{ appointment_data.email if appointment_data else '' }}" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="phone" class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" id="phone" name="phone" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="pet_name" class="form-label">Pet's Name</label>
+                                <input type="text" class="form-control" id="pet_name" name="pet_name" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="pet_type" class="form-label">Pet Type</label>
+                                <select class="form-select" id="pet_type" name="pet_type" required>
+                                    <option value="">Select pet type</option>
+                                    <option value="dog">Dog</option>
+                                    <option value="cat">Cat</option>
+                                    <option value="bird">Bird</option>
+                                    <option value="small_animal">Small Animal</option>
+                                    <option value="reptile">Reptile</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="pet_age" class="form-label">Pet's Age</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="pet_age" name="pet_age" min="0" required>
+                                    <select class="form-select" id="age_unit" name="age_unit" aria-label="Pet age unit">
+                                        <option value="years">Years</option>
+                                        <option value="months">Months</option>
+                                        <option value="weeks">Weeks</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="appointment_type" class="form-label">Appointment Type</label>
+                            <select class="form-select" id="appointment_type" name="appointment_type" required>
+                                <option value="">Select appointment type</option>
+                                <option value="wellness">Wellness Check-up</option>
+                                <option value="vaccination">Vaccination</option>
+                                <option value="illness">Illness/Injury</option>
+                                <option value="dental">Dental Care</option>
+                                <option value="surgery">Surgery Consultation</option>
+                                <option value="grooming">Grooming</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="appointment_date" class="form-label">Preferred Date</label>
+                                <input type="date" class="form-control" id="appointment_date" name="appointment_date" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="appointment_time" class="form-label">Preferred Time</label>
+                                <select class="form-select" id="appointment_time" name="appointment_time" required>
+                                    <option value="">Select time</option>
+                                    <option value="morning">Morning (9AM - 12PM)</option>
+                                    <option value="afternoon">Afternoon (1PM - 5PM)</option>
+                                    <option value="evening">Evening (6PM - 8PM)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="notes" class="form-label">Additional Notes</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Book Appointment</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card mt-4 shadow">
+                <div class="card-body">
+                    <h5 class="card-title">Our Veterinary Services</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check-circle text-success me-2"></i>Wellness Exams</li>
+                                <li><i class="fas fa-check-circle text-success me-2"></i>Vaccinations</li>
+                                <li><i class="fas fa-check-circle text-success me-2"></i>Dental Care</li>
+                                <li><i class="fas fa-check-circle text-success me-2"></i>Surgery</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check-circle text-success me-2"></i>Diagnostic Services</li>
+                                <li><i class="fas fa-check-circle text-success me-2"></i>Emergency Care</li>
+                                <li><i class="fas fa-check-circle text-success me-2"></i>Grooming</li>
+                                <li><i class="fas fa-check-circle text-success me-2"></i>Nutritional Counseling</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-map-marker-alt fa-3x text-primary mb-3"></i>
+                    <h3 class="card-title">Location</h3>
+                    <p class="card-text">123 Pet Care Avenue<br>Indiranagar, Bangalore 560038</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-clock fa-3x text-primary mb-3"></i>
+                    <h3 class="card-title">Hours</h3>
+                    <p class="card-text">Monday - Friday: 9AM - 8PM<br>Saturday: 10AM - 6PM<br>Sunday: Closed</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-phone-alt fa-3x text-primary mb-3"></i>
+                    <h3 class="card-title">Contact</h3>
+                    <p class="card-text">Phone: +91 80 4567 8901<br>Email: appointments@petcare.com</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}Adopt {{ pet.name }} - PetCare Companion{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4 text-center">Adopt {{ pet.name }}</h1>
+
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <!-- Pet Information -->
+            <div class="card mb-4">
+                <div class="row g-0">
+                    <div class="col-md-4">
+                        <img src="{{ url_for('static', filename='images/pets/' + pet.image) }}"
+                             class="img-fluid rounded-start h-100"
+                             alt="{{ pet.name }}"
+                             onerror="this.src='https://images.unsplash.com/photo-1543466835-00a7907e9de1?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'">
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body">
+                            <h3 class="card-title">You're applying to adopt {{ pet.name }}!</h3>
+                            <p class="card-text">
+                                <strong>Type:</strong> {{ pet.type }}<br>
+                                <strong>Breed:</strong> {{ pet.breed }}<br>
+                                <strong>Age:</strong> {{ pet.age }}<br>
+                                <strong>Gender:</strong> {{ pet.gender }}<br>
+                                <strong>Location:</strong> {{ pet.location }}
+                            </p>
+                            <p class="card-text">{{ pet.description }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Adoption Application Form -->
+            <div class="card shadow">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Submit Your Adoption Application</h5>
+
+                    {% if success_message %}
+                    <div class="alert alert-success" role="alert">
+                        {{ success_message }}
+                    </div>
+                    {% endif %}
+
+                    {% if error_message %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ error_message }}
+                    </div>
+                    {% endif %}
+
+                    <form action="{{ url_for('adopt_pet', pet_id=pet.id) }}" method="POST">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="applicant_name" class="form-label">Your Name</label>
+                                <input type="text" class="form-control" id="applicant_name" name="applicant_name" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="email" class="form-label">Email Address</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="phone" class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" id="phone" name="phone" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="living_situation" class="form-label">Living Situation</label>
+                                <select class="form-select" id="living_situation" name="living_situation" required>
+                                    <option value="">Select your living situation</option>
+                                    <option value="Own House">Own House</option>
+                                    <option value="Rental House">Rental House</option>
+                                    <option value="Apartment">Apartment</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="address" class="form-label">Full Address</label>
+                            <textarea class="form-control" id="address" name="address" rows="3" required></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="experience_with_pets" class="form-label">Experience with Pets</label>
+                            <textarea class="form-control" id="experience_with_pets" name="experience_with_pets" rows="3"
+                                      placeholder="Tell us about your previous experience with pets..."></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="notes" class="form-label">Why do you want to adopt {{ pet.name }}?</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="4"
+                                      placeholder="Tell us why you want to adopt {{ pet.name }} and any other relevant information..."></textarea>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success">Submit Adoption Application</button>
+                            <a href="{{ url_for('adoption') }}" class="btn btn-secondary">Back to Adoption Page</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

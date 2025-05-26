@@ -1,0 +1,14 @@
+/* Common styles for all pages */
+body {
+    font-family: 'Arial', sans-serif;
+}
+
+.hero-section {
+    background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('../images/hero-bg.jpg');
+    background-size: cover;
+    padding: 100px 0;
+    color: white;
+    text-align: center;
+}
+
+/* Add more common styles here */

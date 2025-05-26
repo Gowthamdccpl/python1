@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Appointments - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="fas fa-calendar-check me-2"></i>Manage Appointments</h1>
+        <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+        </a>
+    </div>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>{{ appointments|length }}</h4>
+                            <p class="mb-0">Total Appointments</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-calendar fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>{{ appointments|selectattr("status", "equalto", "pending")|list|length }}</h4>
+                            <p class="mb-0">Pending</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-clock fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>{{ appointments|selectattr("status", "equalto", "confirmed")|list|length }}</h4>
+                            <p class="mb-0">Confirmed</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-check fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>{{ appointments|selectattr("status", "equalto", "completed")|list|length }}</h4>
+                            <p class="mb-0">Completed</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-check-double fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Appointments Table -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-list me-2"></i>All Appointments</h5>
+        </div>
+        <div class="card-body">
+            {% if appointments %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Owner</th>
+                                <th>Pet Details</th>
+                                <th>Appointment Type</th>
+                                <th>Date & Time</th>
+                                <th>Contact</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for appointment in appointments %}
+                            <tr>
+                                <td>{{ appointment.id }}</td>
+                                <td>
+                                    <strong>{{ appointment.owner_name }}</strong>
+                                </td>
+                                <td>
+                                    <strong>{{ appointment.pet_name }}</strong><br>
+                                    <small class="text-muted">{{ appointment.pet_type }} - {{ appointment.pet_age }} {{ appointment.age_unit }}</small>
+                                </td>
+                                <td>{{ appointment.appointment_type }}</td>
+                                <td>
+                                    <strong>{{ appointment.appointment_date }}</strong><br>
+                                    <small class="text-muted">{{ appointment.appointment_time }}</small>
+                                </td>
+                                <td>
+                                    <small>
+                                        <i class="fas fa-envelope me-1"></i>{{ appointment.email }}<br>
+                                        <i class="fas fa-phone me-1"></i>{{ appointment.phone }}
+                                    </small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-{{ 'warning' if appointment.status == 'pending' else 'success' if appointment.status == 'confirmed' else 'info' if appointment.status == 'completed' else 'danger' }}">
+                                        {{ appointment.status|title }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown">
+                                            Update Status
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <form method="POST" action="{{ url_for('admin_update_appointment_status', appointment_id=appointment.id) }}" style="display: inline;">
+                                                    <input type="hidden" name="status" value="pending">
+                                                    <button type="submit" class="dropdown-item">
+                                                        <i class="fas fa-clock me-2"></i>Pending
+                                                    </button>
+                                                </form>
+                                            </li>
+                                            <li>
+                                                <form method="POST" action="{{ url_for('admin_update_appointment_status', appointment_id=appointment.id) }}" style="display: inline;">
+                                                    <input type="hidden" name="status" value="confirmed">
+                                                    <button type="submit" class="dropdown-item">
+                                                        <i class="fas fa-check me-2"></i>Confirmed
+                                                    </button>
+                                                </form>
+                                            </li>
+                                            <li>
+                                                <form method="POST" action="{{ url_for('admin_update_appointment_status', appointment_id=appointment.id) }}" style="display: inline;">
+                                                    <input type="hidden" name="status" value="completed">
+                                                    <button type="submit" class="dropdown-item">
+                                                        <i class="fas fa-check-double me-2"></i>Completed
+                                                    </button>
+                                                </form>
+                                            </li>
+                                            <li>
+                                                <form method="POST" action="{{ url_for('admin_update_appointment_status', appointment_id=appointment.id) }}" style="display: inline;">
+                                                    <input type="hidden" name="status" value="cancelled">
+                                                    <button type="submit" class="dropdown-item text-danger">
+                                                        <i class="fas fa-times me-2"></i>Cancelled
+                                                    </button>
+                                                </form>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    {% if appointment.notes %}
+                                    <button type="button" class="btn btn-sm btn-outline-info ms-1" data-bs-toggle="modal" data-bs-target="#notesModal{{ appointment.id }}">
+                                        <i class="fas fa-sticky-note"></i>
+                                    </button>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No appointments found</h5>
+                    <p class="text-muted">Appointments will appear here when users book them.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Notes Modals -->
+{% for appointment in appointments %}
+    {% if appointment.notes %}
+    <div class="modal fade" id="notesModal{{ appointment.id }}" tabindex="-1" aria-labelledby="notesModalLabel{{ appointment.id }}" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="notesModalLabel{{ appointment.id }}">
+                        Notes for {{ appointment.owner_name }}'s Appointment
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>{{ appointment.notes }}</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+{% endfor %}
+{% endblock %}

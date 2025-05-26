@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}Home - PetCare Companion{% endblock %}
+
+{% block content %}
+<section class="hero-section bg-primary text-white text-center py-5 mb-4">
+    <div class="container">
+        <h1 class="display-4">Welcome to PetCare Companion</h1>
+        <p class="lead">Your one-stop solution for all pet care needs</p>
+        <a href="{{ url_for('food_recommendation') }}" class="btn btn-light btn-lg mt-3">Get Food Recommendations</a>
+    </div>
+</section>
+
+<section class="features py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="fas fa-paw fa-3x text-primary mb-3"></i>
+                        <h3 class="card-title">Pet Adoption</h3>
+                        <p class="card-text">Find your perfect furry companion from our shelter.</p>
+                        <a href="{{ url_for('adoption') }}" class="btn btn-outline-primary">Learn More</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="fas fa-heart fa-3x text-danger mb-3"></i>
+                        <h3 class="card-title">Donations</h3>
+                        <p class="card-text">Support our mission to help pets in need.</p>
+                        <a href="{{ url_for('donation') }}" class="btn btn-outline-primary">Donate Now</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="fas fa-calendar-alt fa-3x text-success mb-3"></i>
+                        <h3 class="card-title">Vet Appointment</h3>
+                        <p class="card-text">Schedule a check-up for your pet with our experts.</p>
+                        <a href="{{ url_for('appointment') }}" class="btn btn-outline-primary">Book Now</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="stats bg-light py-5">
+    <div class="container">
+        <h2 class="text-center mb-4">Our Pet Food Database</h2>
+
+        <div class="row text-center">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h3 class="display-4 text-primary">{{ total_records }}</h3>
+                        <p class="lead">Total Food Products</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h3 class="display-4 text-primary">{{ brand_counts|length }}</h3>
+                        <p class="lead">Different Brands</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h3 class="display-4 text-primary">{{ life_stage_counts|length }}</h3>
+                        <p class="lead">Life Stages Covered</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-primary">View Detailed Statistics</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

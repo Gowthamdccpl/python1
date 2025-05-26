@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}Food Recommendations - PetCare Companion{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">Recommended Food for Your {{ pet_type|capitalize }}</h1>
+
+    {% if health_conditions %}
+    <div class="alert alert-info mb-4">
+        <strong>Health Conditions:</strong>
+        {% for condition in health_conditions %}
+            <span class="badge bg-secondary me-1">{{ condition }}</span>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if error_message %}
+    <div class="alert alert-warning" role="alert">
+        {{ error_message }}
+        <p class="mt-2">
+            <a href="{{ url_for('food_recommendation') }}" class="btn btn-primary">Try Again</a>
+        </p>
+    </div>
+    {% elif recommendations|length == 0 %}
+    <div class="alert alert-info" role="alert">
+        No recommendations found for your pet's profile. Please try different parameters.
+        <p class="mt-2">
+            <a href="{{ url_for('food_recommendation') }}" class="btn btn-primary">Try Again</a>
+        </p>
+    </div>
+    {% else %}
+    <div class="row">
+        {% for food in recommendations %}
+        <div class="col-md-6 mb-4">
+            <div class="card h-100 shadow">
+                <div class="row g-0">
+                    <div class="col-md-5">
+                        <img src="{{ food.image_url }}" class="img-fluid rounded-start h-100 food-image" alt="{{ food.food_name }}">
+                    </div>
+                    <div class="col-md-7">
+                        <div class="card-body d-flex flex-column h-100">
+                            <div>
+                                <h3 class="card-title">{{ food.food_name }}</h3>
+                                <h5 class="text-muted">{{ food.brand }}</h5>
+
+                                <div class="d-flex justify-content-between mt-3">
+                                    <span class="badge bg-primary">{{ food.life_stage }}</span>
+                                    {% if food.special_needs and food.special_needs != 'None' %}
+                                    <span class="badge bg-info">{{ food.special_needs }}</span>
+                                    {% endif %}
+                                </div>
+
+                                <div class="mt-3">
+                                    <p><strong>Breed:</strong> {{ food.breed }}</p>
+                                    <p><strong>Size:</strong> {{ food.animal_size }}</p>
+                                    <p><strong>Calories:</strong> {{ food.calories }} kcal</p>
+                                </div>
+
+                                <div class="nutrition-facts mb-3">
+                                    <small class="text-muted">Nutrition Information:</small>
+                                    <div class="d-flex flex-wrap gap-2 mt-1">
+                                        <span class="badge bg-light text-dark">{{ food.calories }} kcal</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-auto">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <span class="text-warning">★ {{ food.rating }}</span>
+                                        <small class="text-muted">({{ food.rating_count }} reviews)</small>
+                                    </div>
+                                    <h5 class="text-success mb-0">${{ food.price }}</h5>
+                                </div>
+                                <a href="{{ food.purchase_link }}" class="btn btn-primary w-100 mt-2" target="_blank">Buy Now</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="text-center mb-4">
+        <a href="{{ url_for('food_recommendation') }}" class="btn btn-outline-secondary">Back to Recommendation Form</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block title %}Add Pet - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="fas fa-plus me-2"></i>Add New Pet</h1>
+        <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+        </a>
+    </div>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Add Pet Form -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-paw me-2"></i>Pet Information</h5>
+        </div>
+        <div class="card-body">
+            <form method="POST" enctype="multipart/form-data">
+                <div class="row">
+                    <!-- Basic Information -->
+                    <div class="col-md-6">
+                        <h6 class="text-primary mb-3">Basic Information</h6>
+                        
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Pet Name *</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="type" class="form-label">Pet Type *</label>
+                            <select class="form-select" id="type" name="type" required>
+                                <option value="">Select Type</option>
+                                <option value="Dog">Dog</option>
+                                <option value="Cat">Cat</option>
+                                <option value="Bird">Bird</option>
+                                <option value="Rabbit">Rabbit</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="breed" class="form-label">Breed *</label>
+                            <input type="text" class="form-control" id="breed" name="breed" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="age" class="form-label">Age *</label>
+                            <input type="text" class="form-control" id="age" name="age" placeholder="e.g., 2 years, 6 months" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="gender" class="form-label">Gender *</label>
+                            <select class="form-select" id="gender" name="gender" required>
+                                <option value="">Select Gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="size" class="form-label">Size *</label>
+                            <select class="form-select" id="size" name="size" required>
+                                <option value="">Select Size</option>
+                                <option value="Small">Small</option>
+                                <option value="Medium">Medium</option>
+                                <option value="Large">Large</option>
+                                <option value="Extra Large">Extra Large</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="color" class="form-label">Color *</label>
+                            <input type="text" class="form-control" id="color" name="color" required>
+                        </div>
+                    </div>
+                    
+                    <!-- Health & Additional Information -->
+                    <div class="col-md-6">
+                        <h6 class="text-primary mb-3">Health & Additional Information</h6>
+                        
+                        <div class="mb-3">
+                            <label for="health_status" class="form-label">Health Status *</label>
+                            <select class="form-select" id="health_status" name="health_status" required>
+                                <option value="">Select Health Status</option>
+                                <option value="Healthy">Healthy</option>
+                                <option value="Minor Issues">Minor Issues</option>
+                                <option value="Under Treatment">Under Treatment</option>
+                                <option value="Special Needs">Special Needs</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="vaccination_status" class="form-label">Vaccination Status *</label>
+                            <select class="form-select" id="vaccination_status" name="vaccination_status" required>
+                                <option value="">Select Vaccination Status</option>
+                                <option value="Up to date">Up to date</option>
+                                <option value="Partially vaccinated">Partially vaccinated</option>
+                                <option value="Not vaccinated">Not vaccinated</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="spayed_neutered" name="spayed_neutered">
+                                <label class="form-check-label" for="spayed_neutered">
+                                    Spayed/Neutered
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="special_needs" class="form-label">Special Needs</label>
+                            <textarea class="form-control" id="special_needs" name="special_needs" rows="2" placeholder="Any special care requirements"></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="adoption_fee" class="form-label">Adoption Fee (₹) *</label>
+                            <input type="number" class="form-control" id="adoption_fee" name="adoption_fee" min="0" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="location" class="form-label">Location *</label>
+                            <input type="text" class="form-control" id="location" name="location" placeholder="e.g., Koramangala, Bangalore" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="image" class="form-label">Pet Image</label>
+                            <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                            <div class="form-text">Upload a clear photo of the pet (JPG, PNG, GIF)</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Description -->
+                <div class="row">
+                    <div class="col-12">
+                        <h6 class="text-primary mb-3">Description & Contact</h6>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description *</label>
+                            <textarea class="form-control" id="description" name="description" rows="4" 
+                                      placeholder="Describe the pet's personality, behavior, and any other relevant information" required></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="contact_info" class="form-label">Contact Information *</label>
+                            <input type="text" class="form-control" id="contact_info" name="contact_info" 
+                                   placeholder="e.g., Contact: Bangalore Animal Shelter - 080-1234-5678" required>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Submit Buttons -->
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save me-1"></i>Add Pet
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

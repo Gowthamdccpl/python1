@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+
+{% block title %}Donations - PetCare Companion{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-5">
+        <div class="col-md-12 text-center">
+            <h1 class="mb-4">Support Our Cause</h1>
+            <p class="lead">Your donations help us provide care for animals in need. Every contribution makes a difference!</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h3 class="card-title mb-4">Why Donate?</h3>
+                    <div class="mb-4">
+                        <h5><i class="fas fa-paw me-2"></i>Medical Care</h5>
+                        <p>Your donations help us provide veterinary care, medications, and surgeries for animals in need.</p>
+                    </div>
+                    <div class="mb-4">
+                        <h5><i class="fas fa-home me-2"></i>Shelter & Food</h5>
+                        <p>We provide shelter, food, and daily care for abandoned and rescued animals until they find their forever homes.</p>
+                    </div>
+                    <div class="mb-4">
+                        <h5><i class="fas fa-heart me-2"></i>Rescue Operations</h5>
+                        <p>Your support helps fund our rescue operations to save animals from dangerous situations.</p>
+                    </div>
+                    <div>
+                        <h5><i class="fas fa-hands-helping me-2"></i>Community Programs</h5>
+                        <p>We run educational programs and community outreach to promote responsible pet ownership.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h3 class="card-title mb-4">Payment Options</h3>
+
+                    <div class="payment-options mb-4">
+                        <h5 class="mb-3">Mobile Payment</h5>
+
+                        <div class="text-center mb-4">
+                            <div class="qr-container mx-auto">
+                                <img src="{{ url_for('static', filename='images/gpay_qr.png') }}" alt="UPI QR Code" class="img-fluid qr-code mb-2">
+                                <p class="text-center mb-1"><strong>Scan to pay with any UPI app</strong></p>
+                                <p class="text-center mb-0"><strong>UPI ID:</strong> ksgowtham007-1@oksbi</p>
+                                <p class="text-center mb-0"><strong>Bank:</strong> Kotak Mahindra Bank 4334</p>
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center mb-3 payment-option">
+                            <div class="payment-icon me-3">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Pay_Logo.svg" alt="Google Pay" width="50">
+                            </div>
+                            <div>
+                                <h6 class="mb-1">Google Pay (GPay)</h6>
+                                <p class="mb-0"><strong>Number:</strong> 7996622816</p>
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center mb-4 payment-option">
+                            <div class="payment-icon me-3">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/PhonePe_Logo.png/800px-PhonePe_Logo.png" alt="PhonePe" width="50">
+                            </div>
+                            <div>
+                                <h6 class="mb-1">PhonePe</h6>
+                                <p class="mb-0"><strong>Number:</strong> 7996622816</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="donation-form">
+                        <h5 class="mb-3">Other Donation Methods</h5>
+                        <form>
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Your Name</label>
+                                <input type="text" class="form-control" id="name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email Address</label>
+                                <input type="email" class="form-control" id="email" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="amount" class="form-label">Donation Amount (₹)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">₹</span>
+                                    <input type="number" class="form-control" id="amount" min="100" required>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Payment Method</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="paymentMethod" id="creditCard" checked>
+                                    <label class="form-check-label" for="creditCard">Credit/Debit Card</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="paymentMethod" id="netBanking">
+                                    <label class="form-check-label" for="netBanking">Net Banking</label>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Donate Now</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h3 class="card-title mb-4">Every Donation Makes a Difference</h3>
+                    <p class="lead mb-4">Thank you for your generosity and support. Your contribution helps us continue our mission to care for animals in need.</p>
+                    <div class="d-flex justify-content-center gap-3">
+                        <div class="donation-amount">
+                            <h4>₹500</h4>
+                            <p>Feeds a rescued pet for a week</p>
+                        </div>
+                        <div class="donation-amount">
+                            <h4>₹1,000</h4>
+                            <p>Provides basic medical care</p>
+                        </div>
+                        <div class="donation-amount">
+                            <h4>₹2,500</h4>
+                            <p>Sponsors a rescue operation</p>
+                        </div>
+                        <div class="donation-amount">
+                            <h4>₹5,000</h4>
+                            <p>Funds a major surgery</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .payment-option {
+        border: 1px solid rgba(0,0,0,0.1);
+        border-radius: 10px;
+        padding: 15px;
+        transition: all 0.3s ease;
+    }
+
+    .payment-option:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .donation-amount {
+        border: 1px solid rgba(0,0,0,0.1);
+        border-radius: 10px;
+        padding: 15px 25px;
+        min-width: 150px;
+    }
+
+    .donation-amount h4 {
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+
+    .donation-amount p {
+        margin-bottom: 0;
+        font-size: 0.9rem;
+    }
+
+    .qr-container {
+        background-color: #e5cccc;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        max-width: 300px;
+        border: 1px solid rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+
+    .qr-container:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+    }
+
+    .qr-code {
+        max-width: 220px;
+        margin: 0 auto;
+    }
+</style>
+{% endblock %}

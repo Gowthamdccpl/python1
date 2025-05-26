@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}Adoption Application Submitted - PetCare Companion{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card shadow">
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-check-circle text-success fa-5x mb-3"></i>
+                        <h1 class="card-title">Adoption Application Submitted!</h1>
+                        <p class="lead">Thank you for your interest in adopting {{ pet.name }}.</p>
+                    </div>
+
+                    <div class="alert alert-info mb-4">
+                        <p class="mb-0">A confirmation email has been sent to <strong>{{ application.email }}</strong>. Please check your inbox for details.</p>
+                    </div>
+
+                    <!-- Application Details -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-header">
+                                    <h5 class="mb-0" style="color: black;">Pet Information</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p style="color: black;"><strong>Pet Name:</strong> {{ pet.name }}</p>
+                                    <p style="color: black;"><strong>Type:</strong> {{ pet.type }}</p>
+                                    <p style="color: black;"><strong>Breed:</strong> {{ pet.breed }}</p>
+                                    <p style="color: black;"><strong>Age:</strong> {{ pet.age }}</p>
+                                    <p style="color: black;"><strong>Location:</strong> {{ pet.location }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-header">
+                                    <h5 class="mb-0" style="color: black;">Your Application</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p style="color: black;"><strong>Applicant:</strong> {{ application.applicant_name }}</p>
+                                    <p style="color: black;"><strong>Email:</strong> {{ application.email }}</p>
+                                    <p style="color: black;"><strong>Phone:</strong> {{ application.phone }}</p>
+                                    <p style="color: black;"><strong>Application ID:</strong> #{{ application.id }}</p>
+                                    <p style="color: black;"><strong>Status:</strong>
+                                        <span class="badge bg-warning">{{ application.application_status|title }}</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Next Steps -->
+                    <div class="alert alert-info">
+                        <h5 style="color: black;"><i class="fas fa-info-circle me-2"></i>What Happens Next?</h5>
+                        <ul style="color: black;">
+                            <li><strong>Review Process:</strong> Our team will review your application within 24-48 hours</li>
+                            <li><strong>Contact:</strong> We will contact you via phone or email to discuss the next steps</li>
+                            <li><strong>Meet & Greet:</strong> If approved, we'll arrange a meeting with {{ pet.name }}</li>
+                            <li><strong>Home Visit:</strong> A brief home visit may be required before finalization</li>
+                            <li><strong>Adoption Fee:</strong> ₹{{ pet.adoption_fee }} (includes vaccinations and health check)</li>
+                        </ul>
+                    </div>
+
+                    <!-- Contact Information -->
+                    <div class="alert alert-success">
+                        <h5 style="color: black;"><i class="fas fa-phone me-2"></i>Need Help?</h5>
+                        <p style="color: black;">If you have any questions about your application, please contact us:</p>
+                        <ul style="color: black;">
+                            <li><strong>Phone:</strong> +91 7996622816</li>
+                            <li><strong>Email:</strong> adoptions@petcare.com</li>
+                            <li><strong>Address:</strong> Bangalore, Karnataka</li>
+                        </ul>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="text-center">
+                        <a href="{{ url_for('adoption') }}" class="btn btn-primary me-3">
+                            <i class="fas fa-arrow-left me-1"></i>Back to Adoption Page
+                        </a>
+                        <a href="{{ url_for('home') }}" class="btn btn-secondary">
+                            <i class="fas fa-home me-1"></i>Go to Home
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Auto-redirect script (optional) -->
+<script>
+    // Show success message
+    document.addEventListener('DOMContentLoaded', function() {
+        // You can add any additional JavaScript here
+        console.log('Adoption application submitted successfully!');
+
+        // Optional: Auto-redirect after 30 seconds
+        // setTimeout(function() {
+        //     window.location.href = "{{ url_for('adoption') }}";
+        // }, 30000);
+    });
+</script>
+
+<style>
+    .card {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+    }
+
+    .card-header {
+        border-radius: 10px 10px 0 0 !important;
+    }
+
+    .alert {
+        border-radius: 10px;
+    }
+
+    .btn {
+        border-radius: 25px;
+        padding: 10px 25px;
+    }
+</style>
+{% endblock %}

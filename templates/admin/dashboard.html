@@ -1,0 +1,267 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - PetCare Companion{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="fas fa-tachometer-alt me-2"></i>Admin Dashboard</h1>
+        <div>
+            <a href="{{ url_for('admin_add_pet') }}" class="btn btn-success me-2">
+                <i class="fas fa-plus me-1"></i>Add New Pet
+            </a>
+            <a href="{{ url_for('admin_logout') }}" class="btn btn-outline-danger">
+                <i class="fas fa-sign-out-alt me-1"></i>Logout
+            </a>
+        </div>
+    </div>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>{{ pets|length }}</h4>
+                            <p class="mb-0">Total Pets</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-paw fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>{{ pending_appointments or 0 }}</h4>
+                            <p class="mb-0">Pending Appointments</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-calendar-alt fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>{{ pending_adoptions or 0 }}</h4>
+                            <p class="mb-0">Pending Adoptions</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-heart fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>{{ total_appointments or 0 }}</h4>
+                            <p class="mb-0">Total Appointments</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-calendar-check fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifications -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-bell me-2"></i>Recent Notifications</h5>
+                </div>
+                <div class="card-body">
+                    {% if unread_appointments > 0 or unread_adoptions > 0 %}
+                        <div class="row">
+                            {% if unread_appointments > 0 %}
+                            <div class="col-md-6 mb-3">
+                                <div class="alert alert-warning">
+                                    <h6><i class="fas fa-calendar-alt me-2"></i>New Appointments</h6>
+                                    <p class="mb-2">{{ unread_appointments }} new appointment request(s)</p>
+                                    {% for appointment in recent_appointments %}
+                                    <div class="notification-item mb-2">
+                                        <a href="{{ url_for('admin_appointment_details', appointment_id=appointment.id) }}" class="text-decoration-none">
+                                            <strong>{{ appointment.owner_name }}</strong> - {{ appointment.appointment_type }}<br>
+                                            <small class="text-muted">{{ appointment.appointment_date }} at {{ appointment.appointment_time }}</small>
+                                        </a>
+                                    </div>
+                                    {% endfor %}
+                                    <a href="{{ url_for('admin_appointments') }}" class="btn btn-sm btn-warning">View All</a>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if unread_adoptions > 0 %}
+                            <div class="col-md-6 mb-3">
+                                <div class="alert alert-success">
+                                    <h6><i class="fas fa-heart me-2"></i>New Adoption Applications</h6>
+                                    <p class="mb-2">{{ unread_adoptions }} new adoption application(s)</p>
+                                    {% for adoption in recent_adoptions %}
+                                    <div class="notification-item mb-2">
+                                        <a href="{{ url_for('admin_adoption_details', adoption_id=adoption.id) }}" class="text-decoration-none">
+                                            <strong>{{ adoption.applicant_name }}</strong> wants to adopt <strong>{{ adoption.pet_name }}</strong><br>
+                                            <small class="text-muted">{{ adoption.application_date }}</small>
+                                        </a>
+                                    </div>
+                                    {% endfor %}
+                                    <a href="{{ url_for('admin_adoptions') }}" class="btn btn-sm btn-success">View All</a>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <div class="text-center text-muted">
+                            <i class="fas fa-bell-slash fa-2x mb-2"></i>
+                            <p>No new notifications</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <a href="{{ url_for('admin_add_pet') }}" class="btn btn-success w-100">
+                                <i class="fas fa-plus me-2"></i>Add New Pet
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{{ url_for('admin_appointments') }}" class="btn btn-info w-100">
+                                <i class="fas fa-calendar-check me-2"></i>Appointments
+                                {% if unread_appointments > 0 %}
+                                <span class="badge bg-danger">{{ unread_appointments }}</span>
+                                {% endif %}
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{{ url_for('admin_adoptions') }}" class="btn btn-warning w-100">
+                                <i class="fas fa-heart me-2"></i>Adoptions
+                                {% if unread_adoptions > 0 %}
+                                <span class="badge bg-danger">{{ unread_adoptions }}</span>
+                                {% endif %}
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{{ url_for('adoption') }}" class="btn btn-primary w-100" target="_blank">
+                                <i class="fas fa-eye me-2"></i>View Site
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pets Table -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-list me-2"></i>Manage Pets</h5>
+        </div>
+        <div class="card-body">
+            {% if pets %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Image</th>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Breed</th>
+                                <th>Age</th>
+                                <th>Location</th>
+                                <th>Fee (₹)</th>
+                                <th>Date Added</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for pet in pets %}
+                            <tr>
+                                <td>{{ pet.id }}</td>
+                                <td>
+                                    <img src="{{ url_for('static', filename='images/pets/' + pet.image) }}"
+                                         alt="{{ pet.name }}" class="img-thumbnail" style="width: 50px; height: 50px; object-fit: cover;">
+                                </td>
+                                <td>{{ pet.name }}</td>
+                                <td>
+                                    <span class="badge bg-{{ 'primary' if pet.type == 'Dog' else 'info' }}">
+                                        {{ pet.type }}
+                                    </span>
+                                </td>
+                                <td>{{ pet.breed }}</td>
+                                <td>{{ pet.age }}</td>
+                                <td>{{ pet.location }}</td>
+                                <td>₹{{ pet.adoption_fee }}</td>
+                                <td>{{ pet.date_added }}</td>
+                                <td>
+                                    <a href="{{ url_for('admin_edit_pet', pet_id=pet.id) }}"
+                                       class="btn btn-sm btn-outline-primary me-1">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form method="POST" action="{{ url_for('admin_delete_pet', pet_id=pet.id) }}"
+                                          style="display: inline;"
+                                          onsubmit="return confirm('Are you sure you want to delete {{ pet.name }}?')">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-paw fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No pets available</h5>
+                    <p class="text-muted">Start by adding your first pet for adoption.</p>
+                    <a href="{{ url_for('admin_add_pet') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-1"></i>Add First Pet
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

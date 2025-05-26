@@ -1,0 +1,306 @@
+{% extends "base.html" %}
+
+{% block title %}Pet Adoption - PetCare Companion{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4 text-center">Adopt a Pet in Bangalore</h1>
+
+    <div class="row mb-5">
+        <div class="col-md-8 offset-md-2">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h5 class="card-title">About Our Adoption Program</h5>
+                    <p>At PetCare Companion, we believe every pet deserves a loving home. Our adoption centers in Bangalore are dedicated to rescuing, rehabilitating, and rehoming pets in need. When you adopt from us, you're not just gaining a new family member – you're giving a deserving animal a second chance at happiness.</p>
+
+                    <div class="alert alert-info mt-3">
+                        <h6 class="mb-2"><i class="fas fa-map-marker-alt me-2"></i>Our Bangalore Locations:</h6>
+                        <ul class="mb-0">
+                            <li>Indiranagar: 123 100ft Road, Indiranagar, Bangalore - 560038</li>
+                            <li>Koramangala: 456 80ft Road, 6th Block, Koramangala, Bangalore - 560095</li>
+                            <li>Whitefield: 789 Whitefield Main Road, Whitefield, Bangalore - 560066</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="text-center mb-4">Pets Available for Adoption</h2>
+
+            <ul class="nav nav-pills mb-4 justify-content-center" id="adoptionTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="all-tab" data-bs-toggle="pill" data-bs-target="#all" type="button" role="tab" aria-controls="all" aria-selected="true">All Pets</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="dogs-tab" data-bs-toggle="pill" data-bs-target="#dogs" type="button" role="tab" aria-controls="dogs" aria-selected="false">Dogs</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="cats-tab" data-bs-toggle="pill" data-bs-target="#cats" type="button" role="tab" aria-controls="cats" aria-selected="false">Cats</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="others-tab" data-bs-toggle="pill" data-bs-target="#others" type="button" role="tab" aria-controls="others" aria-selected="false">Other Pets</button>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="tab-content" id="adoptionTabContent">
+        <!-- All Pets Tab -->
+        <div class="tab-pane fade show active" id="all" role="tabpanel" aria-labelledby="all-tab">
+            <div class="row">
+                {% if pets %}
+                    {% for pet in pets %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100 shadow adoption-card">
+                            <img src="{{ url_for('static', filename='images/pets/' + pet.image) }}"
+                                 class="card-img-top pet-image"
+                                 alt="{{ pet.name }} - {{ pet.breed }}"
+                                 onerror="this.src='https://images.unsplash.com/photo-1543466835-00a7907e9de1?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h5 class="card-title mb-0">{{ pet.name }}</h5>
+                                    <span class="badge bg-{{ 'primary' if pet.type == 'Dog' else 'info' if pet.type == 'Cat' else 'success' }}">{{ pet.type }}</span>
+                                </div>
+                                <p class="card-text">
+                                    <strong>Breed:</strong> {{ pet.breed }}<br>
+                                    <strong>Age:</strong> {{ pet.age }}<br>
+                                    <strong>Gender:</strong> {{ pet.gender }}<br>
+                                    <strong>Location:</strong> {{ pet.location }}
+                                </p>
+                                <p class="card-text">{{ pet.description[:100] }}{% if pet.description|length > 100 %}...{% endif %}</p>
+
+                                <!-- Health and Status Info -->
+                                <div class="mb-2">
+                                    <small class="text-muted">
+                                        <i class="fas fa-heart me-1"></i>{{ pet.health_status }} |
+                                        <i class="fas fa-syringe me-1"></i>{{ pet.vaccination_status }}
+                                        {% if pet.spayed_neutered %}
+                                        | <i class="fas fa-check me-1"></i>Spayed/Neutered
+                                        {% endif %}
+                                    </small>
+                                </div>
+
+                                <!-- Adoption Fee -->
+                                <div class="mb-3">
+                                    <span class="badge bg-warning text-dark">Adoption Fee: ₹{{ pet.adoption_fee }}</span>
+                                </div>
+
+                                <div class="d-grid gap-2">
+                                    <button type="button" class="btn btn-primary" onclick="showPetDetails({{ pet.id }})">Learn More</button>
+                                    <a href="{{ url_for('adopt_pet', pet_id=pet.id) }}" class="btn btn-success">
+                                        <i class="fas fa-heart me-1"></i>Adopt Me
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="col-12 text-center py-5">
+                        <i class="fas fa-paw fa-3x text-muted mb-3"></i>
+                        <h4 class="text-muted">No pets available for adoption at the moment</h4>
+                        <p class="text-muted">Please check back later or contact us for more information.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        </div>
+
+        <!-- Dogs Tab -->
+        <div class="tab-pane fade" id="dogs" role="tabpanel" aria-labelledby="dogs-tab">
+            <!-- Content will be added via JavaScript -->
+        </div>
+
+        <!-- Cats Tab -->
+        <div class="tab-pane fade" id="cats" role="tabpanel" aria-labelledby="cats-tab">
+            <!-- Content will be added via JavaScript -->
+        </div>
+
+        <!-- Others Tab -->
+        <div class="tab-pane fade" id="others" role="tabpanel" aria-labelledby="others-tab">
+            <!-- Content will be added via JavaScript -->
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-md-8 offset-md-2">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h5 class="card-title">Adoption Process</h5>
+                    <ol class="mb-0">
+                        <li class="mb-2"><strong>Visit our center:</strong> Come to any of our Bangalore locations to meet the pets in person.</li>
+                        <li class="mb-2"><strong>Application:</strong> Fill out an adoption application form with your details and living situation.</li>
+                        <li class="mb-2"><strong>Interview:</strong> Our staff will conduct a brief interview to ensure a good match between you and the pet.</li>
+                        <li class="mb-2"><strong>Home check:</strong> For some animals, we may conduct a home visit to ensure the environment is suitable.</li>
+                        <li class="mb-2"><strong>Adoption fee:</strong> Pay the adoption fee which covers vaccinations, microchipping, and spaying/neutering.</li>
+                        <li><strong>Take home:</strong> Once approved, you can take your new family member home!</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mt-5 mb-4">
+        <a href="{{ url_for('contact') }}" class="btn btn-primary btn-lg">Contact Us About Adoption</a>
+    </div>
+</div>
+
+<!-- Pet Details Modal -->
+<div class="modal fade" id="petDetailsModal" tabindex="-1" aria-labelledby="petDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="petDetailsModalLabel">Pet Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="petDetailsContent">
+                <!-- Pet details will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a href="{{ url_for('contact') }}" class="btn btn-primary">Contact Us</a>
+                <a href="#" id="adoptPetBtn" class="btn btn-success">
+                    <i class="fas fa-heart me-1"></i>Adopt Me
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Pet data for JavaScript
+    const petsData = {{ pets | tojson }};
+
+    function showPetDetails(petId) {
+        const pet = petsData.find(p => p.id === petId);
+        if (!pet) return;
+
+        const modalContent = document.getElementById('petDetailsContent');
+        modalContent.innerHTML = `
+            <div class="row">
+                <div class="col-md-6">
+                    <img src="{{ url_for('static', filename='images/pets/') }}${pet.image}"
+                         class="img-fluid rounded" alt="${pet.name}"
+                         onerror="this.src='https://images.unsplash.com/photo-1543466835-00a7907e9de1?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'">
+                </div>
+                <div class="col-md-6">
+                    <h4>${pet.name} <span class="badge bg-primary">${pet.type}</span></h4>
+                    <table class="table table-borderless">
+                        <tr><td><strong>Breed:</strong></td><td>${pet.breed}</td></tr>
+                        <tr><td><strong>Age:</strong></td><td>${pet.age}</td></tr>
+                        <tr><td><strong>Gender:</strong></td><td>${pet.gender}</td></tr>
+                        <tr><td><strong>Size:</strong></td><td>${pet.size}</td></tr>
+                        <tr><td><strong>Color:</strong></td><td>${pet.color}</td></tr>
+                        <tr><td><strong>Health Status:</strong></td><td>${pet.health_status}</td></tr>
+                        <tr><td><strong>Vaccination:</strong></td><td>${pet.vaccination_status}</td></tr>
+                        <tr><td><strong>Spayed/Neutered:</strong></td><td>${pet.spayed_neutered ? 'Yes' : 'No'}</td></tr>
+                        <tr><td><strong>Location:</strong></td><td>${pet.location}</td></tr>
+                        <tr><td><strong>Adoption Fee:</strong></td><td>₹${pet.adoption_fee}</td></tr>
+                    </table>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-12">
+                    <h5>About ${pet.name}</h5>
+                    <p>${pet.description}</p>
+                    ${pet.special_needs ? `<div class="alert alert-info"><strong>Special Needs:</strong> ${pet.special_needs}</div>` : ''}
+                    <div class="alert alert-success">
+                        <strong>Contact Information:</strong><br>
+                        ${pet.contact_info}
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Update the Adopt Me button link in modal
+        const adoptBtn = document.getElementById('adoptPetBtn');
+        adoptBtn.href = `/adopt/${petId}`;
+
+        const modal = new bootstrap.Modal(document.getElementById('petDetailsModal'));
+        modal.show();
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Filter pets by type for tabs
+        function filterPetsByType(type) {
+            return petsData.filter(pet => type === 'all' || pet.type === type);
+        }
+
+        function createPetCard(pet) {
+            return `
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow adoption-card">
+                        <img src="{{ url_for('static', filename='images/pets/') }}${pet.image}"
+                             class="card-img-top pet-image"
+                             alt="${pet.name} - ${pet.breed}"
+                             onerror="this.src='https://images.unsplash.com/photo-1543466835-00a7907e9de1?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h5 class="card-title mb-0">${pet.name}</h5>
+                                <span class="badge bg-${pet.type === 'Dog' ? 'primary' : pet.type === 'Cat' ? 'info' : 'success'}">${pet.type}</span>
+                            </div>
+                            <p class="card-text">
+                                <strong>Breed:</strong> ${pet.breed}<br>
+                                <strong>Age:</strong> ${pet.age}<br>
+                                <strong>Gender:</strong> ${pet.gender}<br>
+                                <strong>Location:</strong> ${pet.location}
+                            </p>
+                            <p class="card-text">${pet.description.substring(0, 100)}${pet.description.length > 100 ? '...' : ''}</p>
+
+                            <div class="mb-2">
+                                <small class="text-muted">
+                                    <i class="fas fa-heart me-1"></i>${pet.health_status} |
+                                    <i class="fas fa-syringe me-1"></i>${pet.vaccination_status}
+                                    ${pet.spayed_neutered ? ' | <i class="fas fa-check me-1"></i>Spayed/Neutered' : ''}
+                                </small>
+                            </div>
+
+                            <div class="mb-3">
+                                <span class="badge bg-warning text-dark">Adoption Fee: ₹${pet.adoption_fee}</span>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <button type="button" class="btn btn-primary" onclick="showPetDetails(${pet.id})">Learn More</button>
+                                <a href="/adopt/${pet.id}" class="btn btn-success">
+                                    <i class="fas fa-heart me-1"></i>Adopt Me
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Populate Dogs tab
+        const dogsTab = document.getElementById('dogs');
+        const dogPets = filterPetsByType('Dog');
+        if (dogPets.length > 0) {
+            dogsTab.innerHTML = '<div class="row">' + dogPets.map(createPetCard).join('') + '</div>';
+        } else {
+            dogsTab.innerHTML = '<div class="text-center py-5"><h5 class="text-muted">No dogs available for adoption</h5></div>';
+        }
+
+        // Populate Cats tab
+        const catsTab = document.getElementById('cats');
+        const catPets = filterPetsByType('Cat');
+        if (catPets.length > 0) {
+            catsTab.innerHTML = '<div class="row">' + catPets.map(createPetCard).join('') + '</div>';
+        } else {
+            catsTab.innerHTML = '<div class="text-center py-5"><h5 class="text-muted">No cats available for adoption</h5></div>';
+        }
+
+        // Populate Others tab
+        const othersTab = document.getElementById('others');
+        const otherPets = petsData.filter(pet => !['Dog', 'Cat'].includes(pet.type));
+        if (otherPets.length > 0) {
+            othersTab.innerHTML = '<div class="row">' + otherPets.map(createPetCard).join('') + '</div>';
+        } else {
+            othersTab.innerHTML = '<div class="text-center py-5"><h5 class="text-muted">No other pets available for adoption</h5></div>';
+        }
+    });
+</script>
+{% endblock %}

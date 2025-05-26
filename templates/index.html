@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PetCare Companion</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .hero-section {
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://source.unsplash.com/random/1200x600/?pets');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 100px 0;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .nav-card {
+            transition: transform 0.3s;
+            margin-bottom: 20px;
+            height: 100%;
+        }
+        .nav-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #0d6efd;
+        }
+        .prediction-result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">PetCare Companion</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#home">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#adoption">Adoption</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#donation">Donation</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#food-recommendation">Food Recommendation</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#appointment">Appointment</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contact">Contact Us</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section" id="home">
+        <div class="container">
+            <h1 class="display-4">Your Pet's Well-being is Our Priority</h1>
+            <p class="lead">Comprehensive care solutions for your furry friends</p>
+            <a href="#food-recommendation" class="btn btn-primary btn-lg">Get Food Recommendation</a>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Navigation Cards -->
+        <div class="row" id="services">
+            <div class="col-md-4">
+                <div class="card nav-card" onclick="location.href='#adoption'">
+                    <div class="card-body text-center">
+                        <div class="card-icon">🏠</div>
+                        <h5 class="card-title">Pet Adoption</h5>
+                        <p class="card-text">Find your perfect furry companion from our shelter.</p>
+                        <a href="#adoption" class="btn btn-outline-primary">Learn More</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card nav-card" onclick="location.href='#donation'">
+                    <div class="card-body text-center">
+                        <div class="card-icon">❤️</div>
+                        <h5 class="card-title">Donations</h5>
+                        <p class="card-text">Support our mission to help pets in need.</p>
+                        <a href="#donation" class="btn btn-outline-primary">Donate Now</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card nav-card" onclick="location.href='#appointment'">
+                    <div class="card-body text-center">
+                        <div class="card-icon">📅</div>
+                        <h5 class="card-title">Vet Appointment</h5>
+                        <p class="card-text">Schedule a check-up for your pet with our experts.</p>
+                        <a href="#appointment" class="btn btn-outline-primary">Book Now</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Food Recommendation Section -->
+        <section id="food-recommendation" class="my-5 py-4">
+            <h2 class="text-center mb-4">Pet Food Recommendation</h2>
+            <div class="row">
+                <div class="col-md-6 offset-md-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <form action="/predict" method="POST">
+                                <div class="mb-3">
+                                    <label for="type" class="form-label">Pet Type</label>
+                                    <select class="form-select" id="type" name="type" required>
+                                        <option value="">Select pet type</option>
+                                        <option value="dog">Dog</option>
+                                        <option value="cat">Cat</option>
+                                        <option value="rabbit">Rabbit</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="age" class="form-label">Age (months)</label>
+                                    <input type="number" class="form-control" id="age" name="age" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="weight" class="form-label">Weight (kg)</label>
+                                    <input type="number" class="form-control" id="weight" name="weight" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="activity" class="form-label">Activity Level</label>
+                                    <select class="form-select" id="activity" name="activity" required>
+                                        <option value="">Select activity level</option>
+                                        <option value="low">Low</option>
+                                        <option value="medium">Medium</option>
+                                        <option value="high">High</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Get Recommendation</button>
+                            </form>
+                            
+                            {% if prediction_text %}
+                            <div class="card">
+                            <img src="{{ prediction.picture }}" alt="Food Image" width="200">
+                            <h3>{{ prediction.name }}</h3>
+                            <p><strong>Brand:</strong> {{ prediction.brand }}</p>
+                            <p><strong>Calories:</strong> {{ prediction.calories }} kcal</p>
+                            <p><strong>Life Stage:</strong> {{ prediction.lifeStage }}</p>
+                            <p><strong>Breed:</strong> {{ prediction.breed }}</p>
+                            <p><strong>Price:</strong> ${{ prediction.price }}</p>
+                            </div>
+                            {% elif prediction_text %}  
+                            <p>{{ prediction_text }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Adoption Section -->
+        <section id="adoption" class="my-5 py-4 bg-light">
+            <div class="container">
+                <h2 class="text-center mb-4">Pet Adoption</h2>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h3>Find Your Perfect Companion</h3>
+                        <p>We have a variety of loving pets waiting for their forever homes. Our adoption process ensures that each pet finds the right family.</p>
+                        <ul>
+                            <li>Dogs of all breeds and ages</li>
+                            <li>Cats and kittens</li>
+                            <li>Small animals (rabbits, guinea pigs)</li>
+                        </ul>
+                        <a href="#" class="btn btn-primary">View Available Pets</a>
+                    </div>
+                    <div class="col-md-6">
+                        <img src="https://source.unsplash.com/random/600x400/?pets,adoption" alt="Pet Adoption" class="img-fluid rounded">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Donation Section -->
+        <section id="donation" class="my-5 py-4">
+            <div class="container">
+                <h2 class="text-center mb-4">Make a Donation</h2>
+                <div class="row">
+                    <div class="col-md-6">
+                        <img src="https://source.unsplash.com/random/600x400/?pets,charity" alt="Donation" class="img-fluid rounded">
+                    </div>
+                    <div class="col-md-6">
+                        <h3>Support Our Mission</h3>
+                        <p>Your donations help us provide food, shelter, and medical care to pets in need. Every contribution makes a difference.</p>
+                        <div class="mb-3">
+                            <label for="donation-amount" class="form-label">Donation Amount ($)</label>
+                            <input type="number" class="form-control" id="donation-amount" placeholder="Enter amount">
+                        </div>
+                        <button class="btn btn-primary">Donate Now</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Appointment Section -->
+        <section id="appointment" class="my-5 py-4 bg-light">
+            <div class="container">
+                <h2 class="text-center mb-4">Book a Vet Appointment</h2>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h3>Professional Veterinary Care</h3>
+                        <p>Schedule an appointment with our certified veterinarians for routine check-ups or specific health concerns.</p>
+                        <ul>
+                            <li>General health exams</li>
+                            <li>Vaccinations</li>
+                            <li>Dental care</li>
+                            <li>Emergency services</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <form>
+                            <div class="mb-3">
+                                <label for="appointment-name" class="form-label">Your Name</label>
+                                <input type="text" class="form-control" id="appointment-name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="appointment-email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="appointment-email" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="appointment-pet" class="form-label">Pet Type</label>
+                                <input type="text" class="form-control" id="appointment-pet" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="appointment-date" class="form-label">Preferred Date</label>
+                                <input type="date" class="form-control" id="appointment-date" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Book Appointment</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="my-5 py-4">
+            <div class="container">
+                <h2 class="text-center mb-4">Contact Us</h2>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h3>Get in Touch</h3>
+                        <p>Have questions or need assistance? Reach out to our team.</p>
+                        <address>
+                            <strong>PetCare Companion</strong><br>
+                            123 Pet Street<br>
+                            Animal City, AC 12345<br>
+                            <abbr title="Phone">P:</abbr> (123) 456-7890
+                        </address>
+                        <p>Email: info@petcarecompanion.com</p>
+                    </div>
+                    <div class="col-md-6">
+                        <form>
+                            <div class="mb-3">
+                                <label for="contact-name" class="form-label">Name</label>
+                                <input type="text" class="form-control" id="contact-name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="contact-email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="contact-email" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="contact-subject" class="form-label">Subject</label>
+                                <input type="text" class="form-control" id="contact-subject" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="contact-message" class="form-label">Message</label>
+                                <textarea class="form-control" id="contact-message" rows="3" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Send Message</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5>PetCare Companion</h5>
+                    <p>Dedicated to the health and happiness of your pets.</p>
+                </div>
+                <div class="col-md-4">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#home" class="text-white">Home</a></li>
+                        <li><a href="#adoption" class="text-white">Adoption</a></li>
+                        <li><a href="#donation" class="text-white">Donation</a></li>
+                        <li><a href="#food-recommendation" class="text-white">Food Recommendation</a></li>
+                        <li><a href="#appointment" class="text-white">Appointment</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5>Connect With Us</h5>
+                    <a href="#" class="text-white me-2"><i class="bi bi-facebook"></i></a>
+                    <a href="#" class="text-white me-2"><i class="bi bi-twitter"></i></a>
+                    <a href="#" class="text-white me-2"><i class="bi bi-instagram"></i></a>
+                </div>
+            </div>
+            <hr>
+            <div class="text-center">
+                <p class="mb-0">&copy; 2023 PetCare Companion. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

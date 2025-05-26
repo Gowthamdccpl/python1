@@ -1,0 +1,231 @@
+{% extends "base.html" %}
+
+{% block title %}{{ season_data.title }} - PetCare Companion{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Season Banner -->
+    <div class="season-banner mb-5" style="background-color: {{ season_data.theme_color }};">
+        <div class="container py-5">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="display-4 mb-3" style="color: black; font-weight: bold; text-shadow: 2px 2px 4px rgba(255,255,255,0.8);">{{ season_data.title }}</h1>
+                    <p class="lead mb-0" style="color: black; font-weight: bold; text-shadow: 1px 1px 2px rgba(255,255,255,0.8);">{{ season_data.intro }}</p>
+                    <p class="mt-2" style="color: black; font-weight: bold; text-shadow: 1px 1px 2px rgba(255,255,255,0.8);"><i class="fas fa-calendar-alt me-2"></i>{{ season_data.season_months }}</p>
+                </div>
+                <div class="col-md-4 text-center">
+                    <div class="season-icon">
+                        {% if current_season == "summer" %}
+                            <i class="fas fa-sun fa-5x text-white"></i>
+                        {% elif current_season == "monsoon" %}
+                            <i class="fas fa-cloud-rain fa-5x text-white"></i>
+                        {% elif current_season == "autumn" %}
+                            <i class="fas fa-leaf fa-5x text-white"></i>
+                        {% else %}
+                            <i class="fas fa-snowflake fa-5x text-white"></i>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Next Season Countdown -->
+    <div class="card mb-5 next-season-card">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h4 class="mb-2" style="color: black; font-weight: bold;">Coming Soon: {{ next_season_title }}</h4>
+                    <p class="mb-0" style="color: black;">Be prepared for the next season's pet care challenges.</p>
+                </div>
+                <div class="col-md-4 text-center">
+                    <div class="countdown-circle">
+                        <span class="days-number">{{ days_to_next_season }}</span>
+                        <span class="days-text">days</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Season Tips -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="mb-4" style="color: black; font-weight: bold;">Essential {{ current_season|title }} Care Tips</h2>
+        </div>
+
+        {% for tip in season_data.tips %}
+        <div class="col-md-6 mb-4">
+            <div class="card h-100 season-tip-card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="tip-icon me-3" style="background-color: {{ season_data.theme_color }};">
+                            <i class="{{ tip.icon }} text-white"></i>
+                        </div>
+                        <h4 class="card-title mb-0" style="color: black; font-weight: bold;">{{ tip.title }}</h4>
+                    </div>
+                    <p class="card-text">{{ tip.content }}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Emergency Information -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card emergency-card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="emergency-icon me-3">
+                            <i class="fas fa-exclamation-triangle text-white"></i>
+                        </div>
+                        <h3 class="card-title mb-0" style="color: black; font-weight: bold;">{{ season_data.emergency_info.title }}</h3>
+                    </div>
+                    <p class="card-text mb-3">{{ season_data.emergency_info.content }}</p>
+                    <p class="card-text mb-0"><strong>{{ season_data.emergency_info.contact }}</strong></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Seasonal Resources -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="mb-4" style="color: black; font-weight: bold;">Seasonal Resources</h2>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 resource-card">
+                <div class="card-body text-center">
+                    <i class="fas fa-clinic-medical fa-3x mb-3" style="color: {{ season_data.theme_color }};"></i>
+                    <h4 class="card-title" style="color: black; font-weight: bold;">Veterinary Services</h4>
+                    <p class="card-text" style="color: black;">Find veterinarians in Bangalore who specialize in seasonal pet health issues.</p>
+                    <a href="#" class="btn btn-outline-primary" style="color: black; border-color: black; font-weight: bold;">Find Vets</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 resource-card">
+                <div class="card-body text-center">
+                    <i class="fas fa-shopping-basket fa-3x mb-3" style="color: {{ season_data.theme_color }};"></i>
+                    <h4 class="card-title" style="color: black; font-weight: bold;">Seasonal Products</h4>
+                    <p class="card-text" style="color: black;">Essential products to help your pet stay comfortable this season.</p>
+                    <a href="#" class="btn btn-outline-primary" style="color: black; border-color: black; font-weight: bold;">View Products</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 resource-card">
+                <div class="card-body text-center">
+                    <i class="fas fa-map-marked-alt fa-3x mb-3" style="color: {{ season_data.theme_color }};"></i>
+                    <h4 class="card-title" style="color: black; font-weight: bold;">Pet-Friendly Places</h4>
+                    <p class="card-text" style="color: black;">Discover the best pet-friendly locations in Bangalore for this season.</p>
+                    <a href="#" class="btn btn-outline-primary" style="color: black; border-color: black; font-weight: bold;">Explore Places</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .season-banner {
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .season-icon {
+        background-color: rgba(255,255,255,0.2);
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+    }
+
+    .next-season-card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        background-color: #f8f9fa;
+    }
+
+    .countdown-circle {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background-color: {{ season_data.theme_color }};
+        color: black;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+    }
+
+    .days-number {
+        font-size: 2rem;
+        font-weight: 700;
+        line-height: 1;
+    }
+
+    .days-text {
+        font-size: 1rem;
+    }
+
+    .season-tip-card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+    }
+
+    .season-tip-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+    }
+
+    .tip-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .emergency-card {
+        border: none;
+        border-radius: 10px;
+        background-color: #fff8f8;
+        border-left: 5px solid #dc3545;
+    }
+
+    .emergency-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background-color: #dc3545;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .resource-card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+    }
+
+    .resource-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+    }
+</style>
+{% endblock %}

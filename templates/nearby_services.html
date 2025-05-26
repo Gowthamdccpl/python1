@@ -1,0 +1,2470 @@
+{% extends "base.html" %}
+
+{% block title %}Nearby Pet Services - PetCare Companion{% endblock %}
+
+{% block body_class %}nearby-services-page{% endblock %}
+
+{% block content %}
+<!-- Leaflet Maps (Free, No API Key Required) -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- Location Detection Script -->
+<script>
+    // Initialize map when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        initMap();
+    });
+</script>
+<div class="container">
+    <h1 class="mb-4 text-center">Nearby Pet Services in Bangalore</h1>
+
+    <!-- Location Search Section -->
+    <div class="row mb-5">
+        <div class="col-md-8 offset-md-2">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-map-marker-alt me-2"></i>Find Services Near You</h5>
+
+                    <!-- Google Map Container -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title"><i class="fas fa-map me-2"></i>Interactive Map</h5>
+                                    <div id="map" style="height: 400px; border-radius: 8px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Location Status -->
+                    <div id="locationStatus" class="alert alert-info manual-location-hidden">
+                        <i class="fas fa-spinner fa-spin me-2"></i>Getting your location...
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <button type="button" class="btn btn-success w-100 mb-2" onclick="getUserLocation()">
+                                <i class="fas fa-crosshairs me-1"></i>Use My Current Location
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="button" class="btn btn-outline-primary w-100 mb-2" onclick="toggleManualSearch()">
+                                <i class="fas fa-edit me-1"></i>Enter Location Manually
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="button" class="btn btn-warning w-100 mb-2" onclick="useDemoLocation()">
+                                <i class="fas fa-map-pin me-1"></i>Use Demo Location
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Manual Location Input (Hidden by default) -->
+                    <div id="manualLocationDiv" class="manual-location-hidden mt-3">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <input type="text" class="form-control" id="locationInput"
+                                       placeholder="Enter your location (e.g., Koramangala, Bangalore)">
+                            </div>
+                            <div class="col-md-4">
+                                <button class="btn btn-primary w-100" onclick="searchByAddress()">
+                                    <i class="fas fa-search me-1"></i>Search
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Current Location Display -->
+                    <div id="currentLocationDiv" class="current-location-hidden mt-3">
+                        <div class="alert alert-success">
+                            <i class="fas fa-map-marker-alt me-2"></i>
+                            <strong>Your Location:</strong> <span id="currentLocationText"></span>
+                            <button class="btn btn-sm btn-outline-success ms-2" onclick="refreshLocation()">
+                                <i class="fas fa-sync-alt me-1"></i>Refresh
+                            </button>
+                        </div>
+                    </div>
+
+                    <small class="text-muted">We'll show you the nearest veterinary hospitals, pharmacies, and pet shops based on your location</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Service Categories Tabs -->
+    <ul class="nav nav-pills mb-4 justify-content-center" id="servicesTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="hospitals-tab" data-bs-toggle="pill" data-bs-target="#hospitals"
+                    type="button" role="tab" aria-controls="hospitals" aria-selected="true">
+                <i class="fas fa-hospital me-2"></i>Veterinary Hospitals
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="pharmacies-tab" data-bs-toggle="pill" data-bs-target="#pharmacies"
+                    type="button" role="tab" aria-controls="pharmacies" aria-selected="false">
+                <i class="fas fa-pills me-2"></i>Pet Pharmacies
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="petshops-tab" data-bs-toggle="pill" data-bs-target="#petshops"
+                    type="button" role="tab" aria-controls="petshops" aria-selected="false">
+                <i class="fas fa-store me-2"></i>Pet Shops
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="servicesTabContent">
+        <!-- Veterinary Hospitals Tab -->
+        <div class="tab-pane fade show active" id="hospitals" role="tabpanel" aria-labelledby="hospitals-tab">
+            <div class="row">
+                <div class="col-12 mb-3">
+                    <h3><i class="fas fa-hospital me-2 text-danger"></i>Veterinary Hospitals Near You</h3>
+                    <p class="text-muted">Emergency care, surgeries, and comprehensive pet healthcare services</p>
+                </div>
+                {% for hospital in veterinary_hospitals %}
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h5 class="card-title">{{ hospital.name }}</h5>
+                                <span class="badge bg-success">{{ hospital.distance }}</span>
+                            </div>
+
+                            <div class="mb-2">
+                                <div class="d-flex align-items-center mb-1">
+                                    {% for i in range(5) %}
+                                        {% if i < hospital.rating %}
+                                            <i class="fas fa-star text-warning"></i>
+                                        {% else %}
+                                            <i class="far fa-star text-warning"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <span class="ms-2 text-muted">({{ hospital.rating }}/5.0)</span>
+                                </div>
+                            </div>
+
+                            <p class="card-text">
+                                <i class="fas fa-map-marker-alt text-primary me-1"></i>
+                                {{ hospital.address }}
+                            </p>
+
+                            <p class="card-text">
+                                <i class="fas fa-phone text-success me-1"></i>
+                                <a href="tel:{{ hospital.phone }}" class="text-decoration-none">{{ hospital.phone }}</a>
+                            </p>
+
+                            <p class="card-text">
+                                <i class="fas fa-clock text-info me-1"></i>
+                                {{ hospital.timings }}
+                            </p>
+
+                            <div class="mb-3">
+                                <h6>Services:</h6>
+                                <div class="d-flex flex-wrap">
+                                    {% for service in hospital.services %}
+                                    <span class="badge bg-light text-dark me-1 mb-1">{{ service }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2 d-md-flex">
+                                <button class="btn btn-primary"
+                                        data-lat="{{ hospital.lat }}"
+                                        data-lng="{{ hospital.lng }}"
+                                        data-name="{{ hospital.name }}"
+                                        onclick="getDirections(this.dataset.lat, this.dataset.lng, this.dataset.name)">
+                                    <i class="fas fa-directions me-1"></i>Directions
+                                </button>
+                                <button class="btn btn-success"
+                                        data-phone="{{ hospital.phone }}"
+                                        onclick="callPlace(this.dataset.phone)">
+                                    <i class="fas fa-phone me-1"></i>Call
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Pet Pharmacies Tab -->
+        <div class="tab-pane fade" id="pharmacies" role="tabpanel" aria-labelledby="pharmacies-tab">
+            <div class="row">
+                <div class="col-12 mb-3">
+                    <h3><i class="fas fa-pills me-2 text-info"></i>Pet Pharmacies Near You</h3>
+                    <p class="text-muted">Prescription medicines, supplements, and pet health products</p>
+                </div>
+                {% for pharmacy in pet_pharmacies %}
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h5 class="card-title">{{ pharmacy.name }}</h5>
+                                <span class="badge bg-success">{{ pharmacy.distance }}</span>
+                            </div>
+
+                            <div class="mb-2">
+                                <div class="d-flex align-items-center mb-1">
+                                    {% for i in range(5) %}
+                                        {% if i < pharmacy.rating %}
+                                            <i class="fas fa-star text-warning"></i>
+                                        {% else %}
+                                            <i class="far fa-star text-warning"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <span class="ms-2 text-muted">({{ pharmacy.rating }}/5.0)</span>
+                                </div>
+                            </div>
+
+                            <p class="card-text">
+                                <i class="fas fa-map-marker-alt text-primary me-1"></i>
+                                {{ pharmacy.address }}
+                            </p>
+
+                            <p class="card-text">
+                                <i class="fas fa-phone text-success me-1"></i>
+                                <a href="tel:{{ pharmacy.phone }}" class="text-decoration-none">{{ pharmacy.phone }}</a>
+                            </p>
+
+                            <p class="card-text">
+                                <i class="fas fa-clock text-info me-1"></i>
+                                {{ pharmacy.timings }}
+                            </p>
+
+                            <div class="mb-3">
+                                <h6>Available Products:</h6>
+                                <div class="d-flex flex-wrap">
+                                    {% for service in pharmacy.services %}
+                                    <span class="badge bg-light text-dark me-1 mb-1">{{ service }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2 d-md-flex">
+                                <button class="btn btn-primary"
+                                        data-lat="{{ pharmacy.lat }}"
+                                        data-lng="{{ pharmacy.lng }}"
+                                        data-name="{{ pharmacy.name }}"
+                                        onclick="getDirections(this.dataset.lat, this.dataset.lng, this.dataset.name)">
+                                    <i class="fas fa-directions me-1"></i>Directions
+                                </button>
+                                <button class="btn btn-success"
+                                        data-phone="{{ pharmacy.phone }}"
+                                        onclick="callPlace(this.dataset.phone)">
+                                    <i class="fas fa-phone me-1"></i>Call
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Pet Shops Tab -->
+        <div class="tab-pane fade" id="petshops" role="tabpanel" aria-labelledby="petshops-tab">
+            <div class="row">
+                <div class="col-12 mb-3">
+                    <h3><i class="fas fa-store me-2 text-warning"></i>Pet Shops Near You</h3>
+                    <p class="text-muted">Pet food, toys, accessories, and everything your pet needs</p>
+                </div>
+                {% for shop in pet_shops %}
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h5 class="card-title">{{ shop.name }}</h5>
+                                <span class="badge bg-success">{{ shop.distance }}</span>
+                            </div>
+
+                            <div class="mb-2">
+                                <div class="d-flex align-items-center mb-1">
+                                    {% for i in range(5) %}
+                                        {% if i < shop.rating %}
+                                            <i class="fas fa-star text-warning"></i>
+                                        {% else %}
+                                            <i class="far fa-star text-warning"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <span class="ms-2 text-muted">({{ shop.rating }}/5.0)</span>
+                                </div>
+                            </div>
+
+                            <p class="card-text">
+                                <i class="fas fa-map-marker-alt text-primary me-1"></i>
+                                {{ shop.address }}
+                            </p>
+
+                            <p class="card-text">
+                                <i class="fas fa-phone text-success me-1"></i>
+                                <a href="tel:{{ shop.phone }}" class="text-decoration-none">{{ shop.phone }}</a>
+                            </p>
+
+                            <p class="card-text">
+                                <i class="fas fa-clock text-info me-1"></i>
+                                {{ shop.timings }}
+                            </p>
+
+                            <div class="mb-3">
+                                <h6>Products Available:</h6>
+                                <div class="d-flex flex-wrap">
+                                    {% for service in shop.services %}
+                                    <span class="badge bg-light text-dark me-1 mb-1">{{ service }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2 d-md-flex">
+                                <button class="btn btn-primary"
+                                        data-lat="{{ shop.lat }}"
+                                        data-lng="{{ shop.lng }}"
+                                        data-name="{{ shop.name }}"
+                                        onclick="getDirections(this.dataset.lat, this.dataset.lng, this.dataset.name)">
+                                    <i class="fas fa-directions me-1"></i>Directions
+                                </button>
+                                <button class="btn btn-success"
+                                        data-phone="{{ shop.phone }}"
+                                        onclick="callPlace(this.dataset.phone)">
+                                    <i class="fas fa-phone me-1"></i>Call
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Emergency Contact Section -->
+    <div class="row mt-5">
+        <div class="col-md-8 offset-md-2">
+            <div class="card bg-danger text-white">
+                <div class="card-body text-center">
+                    <h5 class="card-title"><i class="fas fa-exclamation-triangle me-2"></i>Emergency Pet Care</h5>
+                    <p class="card-text">For immediate veterinary emergencies, contact these 24/7 services:</p>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Cessna Lifeline Emergency</h6>
+                            <a href="tel:+918041124444" class="btn btn-light">
+                                <i class="fas fa-phone me-1"></i>+91 80 4112 4444
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Pet Emergency Helpline</h6>
+                            <a href="tel:+917996622816" class="btn btn-light">
+                                <i class="fas fa-phone me-1"></i>+91 7996622816
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Global variables
+    let userLatitude = null;
+    let userLongitude = null;
+    let map = null;
+    let userMarker = null;
+    let serviceMarkers = [];
+    let allServices = {
+        hospitals: [],
+        pharmacies: [],
+        shops: []
+    };
+
+    // Initialize Leaflet Map (Free, No API Key Required)
+    function initMap() {
+        console.log('🗺️ Initializing Leaflet Map...');
+
+        try {
+            // Initialize map centered on Bangalore
+            map = L.map('map').setView([12.9716, 77.5946], 12);
+
+            // Add OpenStreetMap tiles (free)
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 19
+            }).addTo(map);
+
+            console.log('✅ Map initialized successfully');
+
+            // Show welcome message
+            showWelcomeMessage();
+
+        } catch (error) {
+            console.error('❌ Map initialization failed:', error);
+            handleMapError();
+        }
+    }
+
+    // Show welcome message
+    function showWelcomeMessage() {
+        const statusDiv = document.getElementById('locationStatus');
+        statusDiv.classList.remove('manual-location-hidden');
+        statusDiv.className = 'alert alert-info';
+        statusDiv.innerHTML = `
+            <i class="fas fa-info-circle me-2"></i>
+            <strong>Welcome to Nearby Pet Services!</strong><br>
+            <small>Click "Use My Current Location" to find services near you, or use "Use Demo Location" to test.</small>
+        `;
+    }
+
+    // Handle map initialization errors
+    function handleMapError() {
+        const mapContainer = document.getElementById('map');
+        mapContainer.innerHTML = `
+            <div class="alert alert-danger text-center p-4">
+                <i class="fas fa-exclamation-triangle fa-2x mb-3"></i>
+                <h5>Map Loading Failed</h5>
+                <p>Unable to load the map. Please refresh the page or try again later.</p>
+                <button type="button" class="btn btn-primary" onclick="location.reload()">
+                    <i class="fas fa-refresh me-2"></i>Refresh Page
+                </button>
+            </div>
+        `;
+    }
+
+    // Handle Google Maps API errors
+    function handleMapsError() {
+        const mapContainer = document.getElementById('map');
+        mapContainer.innerHTML = `
+            <div class="alert alert-warning text-center p-4">
+                <i class="fas fa-exclamation-triangle fa-2x mb-3"></i>
+                <h5>Maps Temporarily Unavailable</h5>
+                <p>Google Maps couldn't load, but we can still find nearby services for you!</p>
+                <button type="button" class="btn btn-primary" onclick="findServicesWithoutMap()">
+                    <i class="fas fa-search me-2"></i>Find Services Near Me
+                </button>
+            </div>
+        `;
+    }
+
+    // Fallback function to find services without map
+    function findServicesWithoutMap() {
+        console.log('Finding services without Google Maps...');
+
+        // Use IP-based location detection
+        showLoadingMessage('Getting your location and finding nearby services...');
+
+        fetch('https://ipapi.co/json/')
+            .then(response => response.json())
+            .then(data => {
+                userLatitude = data.latitude;
+                userLongitude = data.longitude;
+
+                console.log('Location detected via IP:', userLatitude, userLongitude);
+
+                document.getElementById('currentLocationText').textContent =
+                    `${data.city}, ${data.region}, ${data.country}`;
+                document.getElementById('currentLocationDiv').classList.remove('current-location-hidden');
+
+                // Find services using alternative method
+                findServicesAlternative();
+            })
+            .catch(error => {
+                console.error('Location detection failed:', error);
+                // Use demo location as last resort
+                userLatitude = 12.9352; // Koramangala
+                userLongitude = 77.6245;
+
+                document.getElementById('currentLocationText').textContent = 'Demo: Koramangala, Bangalore';
+                document.getElementById('currentLocationDiv').classList.remove('current-location-hidden');
+
+                findServicesAlternative();
+            });
+    }
+
+    // Alternative service finding without Google Places API
+    function findServicesAlternative() {
+        console.log('Using alternative service discovery...');
+
+        // Use our database services and calculate distances
+        const allServicesList = [
+            ...allServices.hospitals.map(s => ({...s, type: 'hospital'})),
+            ...allServices.pharmacies.map(s => ({...s, type: 'pharmacy'})),
+            ...allServices.shops.map(s => ({...s, type: 'shop'}))
+        ];
+
+        // Calculate distances and filter nearby services
+        const nearbyServices = allServicesList.map(service => {
+            const distance = calculateStraightLineDistance(
+                userLatitude, userLongitude, service.lat, service.lng
+            );
+
+            return {
+                ...service,
+                realDistance: distance * 1000, // convert to meters
+                realDistanceText: distance.toFixed(1) + ' km'
+            };
+        }).filter(service => service.realDistance <= 15000) // 15km radius
+          .sort((a, b) => a.realDistance - b.realDistance);
+
+        // Display services
+        displayAlternativeServices(nearbyServices);
+
+        hideLoadingMessage();
+        showSuccessMessage(`Found ${nearbyServices.length} pet services within 15km using alternative method!`);
+    }
+
+    // Display services using alternative method
+    function displayAlternativeServices(services) {
+        const hospitals = services.filter(s => s.type === 'hospital');
+        const pharmacies = services.filter(s => s.type === 'pharmacy');
+        const shops = services.filter(s => s.type === 'shop');
+
+        // Update the service lists
+        updateAlternativeServiceSection('hospitals', hospitals, 'Veterinary Hospitals');
+        updateAlternativeServiceSection('pharmacies', pharmacies, 'Pet Pharmacies');
+        updateAlternativeServiceSection('petshops', shops, 'Pet Stores');
+    }
+
+    // Update service section with alternative method
+    function updateAlternativeServiceSection(sectionId, services, sectionTitle) {
+        const section = document.getElementById(sectionId);
+        if (!section) return;
+
+        const container = section.querySelector('.row') || section;
+        container.innerHTML = '';
+
+        if (services.length === 0) {
+            container.innerHTML = `
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        No ${sectionTitle.toLowerCase()} found within 15km of your location.
+                    </div>
+                </div>
+            `;
+            return;
+        }
+
+        // Add section header
+        const headerDiv = document.createElement('div');
+        headerDiv.className = 'col-12 mb-3';
+        headerDiv.innerHTML = `
+            <h4><i class="fas fa-map-marker-alt me-2"></i>${sectionTitle} Near You (${services.length} found)</h4>
+            <p class="text-muted">Services sorted by distance from your location</p>
+        `;
+        container.appendChild(headerDiv);
+
+        services.forEach(service => {
+            const serviceCard = createAlternativeServiceCard(service);
+            container.appendChild(serviceCard);
+
+            // Add marker to map
+            addServiceMarkerToMap(service);
+        });
+    }
+
+    // Create service card for alternative method
+    function createAlternativeServiceCard(service) {
+        const col = document.createElement('div');
+        col.className = 'col-md-6 col-lg-4 mb-4';
+
+        col.innerHTML = `
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">${service.name}</h5>
+                    <p class="card-text">
+                        <i class="fas fa-map-marker-alt me-2"></i>${service.address}
+                    </p>
+                    <p class="card-text">
+                        <i class="fas fa-phone me-2"></i>${service.phone}
+                    </p>
+                    <p class="card-text">
+                        <i class="fas fa-star me-2"></i>Rating: ${service.rating}/5
+                    </p>
+
+                    <div class="mb-2">
+                        <span class="badge bg-success me-1">
+                            <i class="fas fa-route me-1"></i>${service.realDistanceText}
+                        </span>
+                    </div>
+
+                    <div class="mb-2">
+                        ${service.services.map(s => `<span class="badge bg-secondary me-1">${s}</span>`).join('')}
+                    </div>
+
+                    <p class="card-text">
+                        <small class="text-muted">
+                            <i class="fas fa-clock me-1"></i>${service.timings}
+                        </small>
+                    </p>
+                </div>
+
+                <div class="card-footer">
+                    <div class="d-grid gap-2 d-md-flex">
+                        <button type="button" class="btn btn-primary" onclick="getDirections(${service.lat}, ${service.lng}, '${service.name}')">
+                            <i class="fas fa-directions me-1"></i>Directions
+                        </button>
+                        <button type="button" class="btn btn-success" onclick="callPlace('${service.phone}')">
+                            <i class="fas fa-phone me-1"></i>Call
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        return col;
+    }
+
+    // Add service marker to Leaflet map
+    function addServiceMarkerToMap(service) {
+        // Define marker colors and icons based on service type
+        let markerColor = 'blue';
+        let serviceIcon = '🏢';
+
+        if (service.type === 'hospital') {
+            markerColor = '#dc3545'; // red
+            serviceIcon = '🏥';
+        } else if (service.type === 'pharmacy') {
+            markerColor = '#28a745'; // green
+            serviceIcon = '💊';
+        } else if (service.type === 'shop') {
+            markerColor = '#ffc107'; // yellow
+            serviceIcon = '🏪';
+        }
+
+        // Create custom icon with emoji
+        const icon = L.divIcon({
+            className: 'custom-service-marker',
+            html: `
+                <div style="
+                    background-color: ${markerColor};
+                    width: 30px;
+                    height: 30px;
+                    border-radius: 50%;
+                    border: 2px solid white;
+                    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 14px;
+                    color: white;
+                    font-weight: bold;
+                ">
+                    ${serviceIcon}
+                </div>
+            `,
+            iconSize: [30, 30],
+            iconAnchor: [15, 15]
+        });
+
+        // Create marker with popup
+        const marker = L.marker([service.lat, service.lng], { icon: icon })
+            .addTo(map)
+            .bindPopup(`
+                <div style="min-width: 250px; max-width: 300px;">
+                    <h6><strong>${serviceIcon} ${service.name}</strong></h6>
+                    <p><i class="fas fa-map-marker-alt text-primary"></i> ${service.address}</p>
+                    <p><i class="fas fa-phone text-success"></i> ${service.phone}</p>
+                    <p><i class="fas fa-star text-warning"></i> Rating: ${service.rating}/5</p>
+                    <p><i class="fas fa-route text-info"></i> <strong>${service.realDistanceText}</strong> away</p>
+                    <p><i class="fas fa-clock text-muted"></i> ${service.timings}</p>
+
+                    <div class="mt-2">
+                        <button type="button" class="btn btn-sm btn-primary me-1" onclick="getDirections(${service.lat}, ${service.lng}, '${service.name}')">
+                            <i class="fas fa-directions"></i> Directions
+                        </button>
+                        <button type="button" class="btn btn-sm btn-success" onclick="callPlace('${service.phone}')">
+                            <i class="fas fa-phone"></i> Call
+                        </button>
+                    </div>
+                </div>
+            `);
+
+        serviceMarkers.push(marker);
+    }
+
+    // Update nearby service sections
+    function updateNearbyServiceSections(services) {
+        const hospitals = services.filter(s => s.type === 'hospital');
+        const pharmacies = services.filter(s => s.type === 'pharmacy');
+        const shops = services.filter(s => s.type === 'shop');
+
+        console.log('📊 Updating sections:', {
+            hospitals: hospitals.length,
+            pharmacies: pharmacies.length,
+            shops: shops.length
+        });
+
+        // Update each section
+        updateServiceSection('hospitals', hospitals, 'Veterinary Hospitals');
+        updateServiceSection('pharmacies', pharmacies, 'Pet Pharmacies');
+        updateServiceSection('petshops', shops, 'Pet Stores');
+    }
+
+    // Update individual service section
+    function updateServiceSection(sectionId, services, sectionTitle) {
+        const section = document.getElementById(sectionId);
+        if (!section) {
+            console.warn(`Section ${sectionId} not found`);
+            return;
+        }
+
+        const container = section.querySelector('.row') || section;
+        container.innerHTML = '';
+
+        if (services.length === 0) {
+            container.innerHTML = `
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        No ${sectionTitle.toLowerCase()} found within 15km of your location.
+                        <br><small>Try expanding your search or check a different area.</small>
+                    </div>
+                </div>
+            `;
+            return;
+        }
+
+        // Count North Bangalore services
+        const northBangaloreCount = services.filter(s => s.isNorthBangalore).length;
+
+        // Add section header
+        const headerDiv = document.createElement('div');
+        headerDiv.className = 'col-12 mb-3';
+        headerDiv.innerHTML = `
+            <h4><i class="fas fa-map-marker-alt me-2 text-primary"></i>${sectionTitle} Near You</h4>
+            <p class="text-muted">
+                Found ${services.length} ${sectionTitle.toLowerCase()} within 15km
+                ${northBangaloreCount > 0 ? `<br><span class="badge bg-info me-1">${northBangaloreCount} in North Bangalore</span> <small>(shown first)</small>` : ''}
+            </p>
+        `;
+        container.appendChild(headerDiv);
+
+        // Add service cards
+        services.forEach(service => {
+            const serviceCard = createNearbyServiceCard(service);
+            container.appendChild(serviceCard);
+        });
+    }
+
+    // Create service card for nearby services
+    function createNearbyServiceCard(service) {
+        const col = document.createElement('div');
+        col.className = 'col-md-6 col-lg-4 mb-4';
+
+        // Determine service icon and color
+        let serviceIcon = 'fas fa-building';
+        let badgeColor = 'primary';
+
+        if (service.type === 'hospital') {
+            serviceIcon = 'fas fa-hospital';
+            badgeColor = 'danger';
+        } else if (service.type === 'pharmacy') {
+            serviceIcon = 'fas fa-pills';
+            badgeColor = 'success';
+        } else if (service.type === 'shop') {
+            serviceIcon = 'fas fa-store';
+            badgeColor = 'warning';
+        }
+
+        col.innerHTML = `
+            <div class="card h-100 shadow-sm border-0 nearby-service-card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="${serviceIcon} me-2 text-${badgeColor}"></i>
+                        ${service.name}
+                    </h5>
+                    <p class="card-text">
+                        <i class="fas fa-map-marker-alt me-2 text-muted"></i>
+                        <small>${service.address}</small>
+                    </p>
+                    <p class="card-text">
+                        <i class="fas fa-phone me-2 text-muted"></i>
+                        <small>${service.phone}</small>
+                    </p>
+
+                    <div class="mb-2">
+                        <span class="badge bg-${badgeColor} me-1">
+                            <i class="fas fa-route me-1"></i>${service.realDistanceText}
+                        </span>
+                        <span class="badge bg-secondary">
+                            <i class="fas fa-star me-1"></i>${service.rating}/5
+                        </span>
+                        ${service.isNorthBangalore ? '<span class="badge bg-info"><i class="fas fa-map-marker-alt me-1"></i>North Bangalore</span>' : ''}
+                    </div>
+
+                    <div class="mb-2">
+                        ${service.services.slice(0, 3).map(s => `<span class="badge bg-light text-dark me-1">${s}</span>`).join('')}
+                    </div>
+
+                    <p class="card-text">
+                        <small class="text-muted">
+                            <i class="fas fa-clock me-1"></i>${service.timings}
+                        </small>
+                    </p>
+                </div>
+
+                <div class="card-footer bg-transparent">
+                    <div class="d-grid gap-2 d-md-flex">
+                        <button type="button" class="btn btn-primary btn-sm" onclick="getDirections(${service.lat}, ${service.lng}, '${service.name}')">
+                            <i class="fas fa-directions me-1"></i>Directions
+                        </button>
+                        <button type="button" class="btn btn-success btn-sm" onclick="callPlace('${service.phone}')">
+                            <i class="fas fa-phone me-1"></i>Call
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        return col;
+    }
+
+    // SIMPLE GPS location detection that WORKS
+    function getUserLocationWithAPI() {
+        console.log('Getting location...');
+
+        const statusDiv = document.getElementById('locationStatus');
+        statusDiv.classList.remove('manual-location-hidden');
+        statusDiv.className = 'alert alert-info';
+        statusDiv.innerHTML = `
+            <i class="fas fa-spinner fa-spin me-2"></i>
+            <strong>Getting your location...</strong><br>
+            <small>Please allow location access</small>
+        `;
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                // SUCCESS
+                function(position) {
+                    console.log('SUCCESS! Got location:', position.coords.latitude, position.coords.longitude);
+
+                    userLatitude = position.coords.latitude;
+                    userLongitude = position.coords.longitude;
+
+                    // Update map
+                    map.setView([userLatitude, userLongitude], 14);
+
+                    // Add simple blue marker
+                    if (userMarker) map.removeLayer(userMarker);
+                    userMarker = L.marker([userLatitude, userLongitude])
+                        .addTo(map)
+                        .bindPopup('Your Location')
+                        .openPopup();
+
+                    // Show location
+                    document.getElementById('currentLocationText').textContent =
+                        `${userLatitude.toFixed(4)}, ${userLongitude.toFixed(4)}`;
+                    document.getElementById('currentLocationDiv').classList.remove('current-location-hidden');
+
+                    // Find services
+                    findNearbyServicesWithLocation();
+
+                    // Hide loading
+                    statusDiv.classList.add('manual-location-hidden');
+
+                    alert('✅ Location detected! Finding nearby services...');
+                },
+                // ERROR
+                function(error) {
+                    console.error('Location error:', error);
+
+                    statusDiv.className = 'alert alert-warning';
+                    statusDiv.innerHTML = `
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Location access denied or failed</strong><br>
+                        <button type="button" class="btn btn-sm btn-success mt-2" onclick="useDemoLocation()">
+                            Use Demo Location Instead
+                        </button>
+                    `;
+                },
+                // OPTIONS
+                {
+                    enableHighAccuracy: false,
+                    timeout: 10000,
+                    maximumAge: 300000
+                }
+            );
+        } else {
+            statusDiv.className = 'alert alert-danger';
+            statusDiv.innerHTML = `
+                <i class="fas fa-times me-2"></i>
+                <strong>Geolocation not supported</strong><br>
+                <button type="button" class="btn btn-sm btn-success mt-2" onclick="useDemoLocation()">
+                    Use Demo Location
+                </button>
+            `;
+        }
+    }
+
+    // Add user marker to map
+    function addUserMarker(lat, lng, accuracy, type) {
+        // Remove existing marker
+        if (userMarker) {
+            map.removeLayer(userMarker);
+        }
+
+        // Choose color based on location type
+        let markerColor = '#007bff'; // blue for GPS
+        let title = '📍 Your Location (GPS)';
+
+        if (type === 'IP') {
+            markerColor = '#ffc107'; // yellow for IP
+            title = '📍 Your Approximate Location (IP)';
+        } else if (type === 'Demo') {
+            markerColor = '#17a2b8'; // cyan for demo
+            title = '🎯 Demo Location';
+        }
+
+        // Create marker icon
+        const userIcon = L.divIcon({
+            className: 'user-location-marker',
+            html: `<div style="
+                background: ${markerColor};
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                border: 3px solid white;
+                box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+                position: relative;
+            ">
+                <div style="
+                    position: absolute;
+                    top: -5px;
+                    left: -5px;
+                    width: 30px;
+                    height: 30px;
+                    border-radius: 50%;
+                    background: ${markerColor}33;
+                    animation: pulse 2s infinite;
+                "></div>
+            </div>`,
+            iconSize: [20, 20],
+            iconAnchor: [10, 10]
+        });
+
+        // Add marker with popup
+        userMarker = L.marker([lat, lng], { icon: userIcon })
+            .addTo(map)
+            .bindPopup(`
+                <div style="text-align: center;">
+                    <strong>${title}</strong><br>
+                    ${accuracy ? `<small>Accuracy: ${accuracy.toFixed(0)}m</small><br>` : ''}
+                    <small>${lat.toFixed(6)}, ${lng.toFixed(6)}</small>
+                </div>
+            `)
+            .openPopup();
+    }
+
+    // IP-based location fallback
+    function getLocationByIP() {
+        const statusDiv = document.getElementById('locationStatus');
+        statusDiv.className = 'alert alert-warning';
+        statusDiv.innerHTML = `
+            <i class="fas fa-spinner fa-spin me-2"></i>
+            <strong>🌐 Getting location via IP...</strong><br>
+            <small>GPS not available, using approximate location</small>
+        `;
+
+        fetch('https://ipapi.co/json/')
+            .then(response => response.json())
+            .then(data => {
+                if (data.latitude && data.longitude) {
+                    userLatitude = data.latitude;
+                    userLongitude = data.longitude;
+
+                    console.log('✅ IP Location detected:', data.city, data.region);
+                    console.log('📍 Coordinates:', userLatitude, userLongitude);
+
+                    // Update map
+                    map.setView([userLatitude, userLongitude], 12);
+
+                    // Add IP location marker
+                    addUserMarker(userLatitude, userLongitude, null, 'IP');
+
+                    // Set address and find services
+                    document.getElementById('currentLocationText').textContent =
+                        `${data.city}, ${data.region}, ${data.country} (Approximate)`;
+                    document.getElementById('currentLocationDiv').classList.remove('current-location-hidden');
+
+                    findNearbyServicesWithLocation();
+
+                    // Hide loading and show success
+                    statusDiv.classList.add('manual-location-hidden');
+                    showSuccessMessage(`🌐 Approximate location detected! Found services within 15km.`);
+                } else {
+                    throw new Error('Invalid IP location data');
+                }
+            })
+            .catch(error => {
+                console.error('❌ IP location failed:', error);
+
+                // Final fallback to demo location
+                statusDiv.className = 'alert alert-danger';
+                statusDiv.innerHTML = `
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Location detection failed</strong><br>
+                    <small>Unable to detect your location. Please use demo location.</small>
+                    <div class="mt-2">
+                        <button type="button" class="btn btn-sm btn-success" onclick="useDemoLocation()">
+                            <i class="fas fa-map-pin me-1"></i>Use Demo Location
+                        </button>
+                        <button type="button" class="btn btn-sm btn-primary" onclick="getUserLocationWithAPI()">
+                            <i class="fas fa-redo me-1"></i>Try Again
+                        </button>
+                    </div>
+                `;
+            });
+    }
+
+    // Handle location errors
+    function handleLocationError(error) {
+        const statusDiv = document.getElementById('locationStatus');
+        statusDiv.className = 'alert alert-warning';
+
+        let errorMessage = '';
+        let suggestion = '';
+
+        switch(error.code) {
+            case 1: // PERMISSION_DENIED
+                errorMessage = 'Location access denied';
+                suggestion = 'Please enable location access in your browser settings and refresh the page';
+                break;
+            case 2: // POSITION_UNAVAILABLE
+                errorMessage = 'Location unavailable';
+                suggestion = 'Please check your internet connection and try again';
+                break;
+            case 3: // TIMEOUT
+                errorMessage = 'Location request timed out';
+                suggestion = 'Please try again or use demo location';
+                break;
+            default:
+                errorMessage = 'Location detection failed';
+                suggestion = 'Please try demo location instead';
+        }
+
+        statusDiv.innerHTML = `
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong>${errorMessage}</strong><br>
+            <small>${suggestion}</small><br>
+            <div class="mt-2">
+                <button type="button" class="btn btn-sm btn-primary me-2" onclick="getUserLocationWithAPI()">
+                    <i class="fas fa-redo me-1"></i>Try Again
+                </button>
+                <button type="button" class="btn btn-sm btn-success" onclick="useDemoLocation()">
+                    <i class="fas fa-map-pin me-1"></i>Use Demo Location
+                </button>
+            </div>
+        `;
+    }
+
+    // Fallback IP-based location detection
+    function getLocationByIP() {
+        console.log('Getting location via IP...');
+
+        fetch('https://ipapi.co/json/')
+            .then(response => response.json())
+            .then(data => {
+                userLatitude = data.latitude;
+                userLongitude = data.longitude;
+
+                console.log('IP Location detected:', userLatitude, userLongitude, data.city);
+
+                // Update map center
+                map.setView([userLatitude, userLongitude], 12);
+
+                // Add user location marker
+                if (userMarker) {
+                    map.removeLayer(userMarker);
+                }
+                userMarker = L.marker([userLatitude, userLongitude])
+                    .addTo(map)
+                    .bindPopup('Your Approximate Location (IP-based)')
+                    .openPopup();
+
+                document.getElementById('currentLocationText').textContent =
+                    `${data.city}, ${data.region}, ${data.country}`;
+                document.getElementById('currentLocationDiv').classList.remove('current-location-hidden');
+
+                findNearbyServices();
+
+                const statusDiv = document.getElementById('locationStatus');
+                statusDiv.classList.add('manual-location-hidden');
+            })
+            .catch(error => {
+                console.error('IP location failed:', error);
+                console.log('Using demo location as fallback...');
+                useDemoLocation();
+            });
+    }
+
+    // Get address from coordinates using free Nominatim API
+    function getAddressFromCoordinates(lat, lng) {
+        console.log('🔍 Getting address for coordinates...');
+
+        // Use Nominatim (OpenStreetMap) for reverse geocoding (free)
+        const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.display_name) {
+                    const address = data.display_name;
+                    document.getElementById('currentLocationText').textContent = address;
+                    document.getElementById('currentLocationDiv').classList.remove('current-location-hidden');
+                    console.log('✅ Address found:', address);
+                } else {
+                    const fallbackAddress = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+                    document.getElementById('currentLocationText').textContent = fallbackAddress;
+                    document.getElementById('currentLocationDiv').classList.remove('current-location-hidden');
+                    console.log('📍 Using coordinates as address');
+                }
+            })
+            .catch(error => {
+                console.error('❌ Address lookup failed:', error);
+                const fallbackAddress = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+                document.getElementById('currentLocationText').textContent = fallbackAddress;
+                document.getElementById('currentLocationDiv').classList.remove('current-location-hidden');
+            });
+    }
+
+    // Find nearby services based on user location
+    function findNearbyServicesWithLocation() {
+        if (!userLatitude || !userLongitude) {
+            console.error('❌ No user location available');
+            return;
+        }
+
+        console.log('🔍 Finding nearby pet services...');
+
+        // Clear existing service markers
+        serviceMarkers.forEach(marker => map.removeLayer(marker));
+        serviceMarkers = [];
+
+        // Get all services from our database
+        const allServicesList = [
+            ...allServices.hospitals.map(s => ({...s, type: 'hospital'})),
+            ...allServices.pharmacies.map(s => ({...s, type: 'pharmacy'})),
+            ...allServices.shops.map(s => ({...s, type: 'shop'}))
+        ];
+
+        console.log('📊 Total services in database:', allServicesList.length);
+
+        // Calculate distances and filter nearby services
+        const nearbyServices = allServicesList.map(service => {
+            const distance = calculateDistance(
+                userLatitude, userLongitude,
+                service.lat, service.lng
+            );
+
+            // Check if service is in North Bangalore
+            const isNorthBangalore = isInNorthBangalore(service.address);
+
+            return {
+                ...service,
+                realDistance: distance * 1000, // convert to meters
+                realDistanceText: distance.toFixed(1) + ' km',
+                distanceKm: distance,
+                isNorthBangalore: isNorthBangalore
+            };
+        }).filter(service => service.distanceKm <= 15) // 15km radius
+          .sort((a, b) => {
+              // ALWAYS show North Bangalore areas first
+              if (a.isNorthBangalore && !b.isNorthBangalore) return -1;
+              if (!a.isNorthBangalore && b.isNorthBangalore) return 1;
+              // Within same region, sort by distance
+              return a.distanceKm - b.distanceKm;
+          });
+
+        console.log('📍 Services within 15km:', nearbyServices.length);
+
+        // Add markers to map
+        nearbyServices.forEach(service => {
+            addServiceMarkerToMap(service);
+        });
+
+        // Update service sections
+        updateNearbyServiceSections(nearbyServices);
+
+        // Show results
+        showSuccessMessage(`Found ${nearbyServices.length} pet services within 15km of your location!`);
+    }
+
+    // Calculate distance between two points using Haversine formula
+    function calculateDistance(lat1, lng1, lat2, lng2) {
+        const R = 6371; // Earth's radius in km
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLng = (lng2 - lng1) * Math.PI / 180;
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                  Math.sin(dLng/2) * Math.sin(dLng/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return R * c;
+    }
+
+    // Check if service is in North Bangalore areas
+    function isInNorthBangalore(address) {
+        const northBangaloreAreas = [
+            'mathikere',
+            'sanjay nagar',
+            'yelahanka',
+            'hebbal',
+            'r t nagar',
+            'rt nagar',
+            'nagavara',
+            'rmv 2nd stage',
+            'rmv',
+            'sadashiv nagar',
+            'cbi bus stop',
+            'cbi road',
+            'cbi',
+            'malleshwaram',
+            'rajajinagar',
+            'seshadripuram',
+            'gandhinagar',
+            'chickpet',
+            'basavanagudi',
+            'jayanagar'
+        ];
+
+        const addressLower = address.toLowerCase();
+
+        // Check if any North Bangalore area is mentioned in the address
+        return northBangaloreAreas.some(area => addressLower.includes(area));
+    }
+
+    // Find REAL nearby services using Google Places API
+    function findRealNearbyServices() {
+        if (!userLatitude || !userLongitude) return;
+
+        console.log('🔍 Finding REAL nearby services using Google Places API...');
+
+        // Clear existing service markers
+        serviceMarkers.forEach(marker => marker.setMap(null));
+        serviceMarkers = [];
+
+        const userLocation = new google.maps.LatLng(userLatitude, userLongitude);
+
+        // Show loading message
+        showLoadingMessage('Searching for real pet services near your location...');
+
+        // Search for different types of pet services
+        searchVeterinaryCare(userLocation);
+        searchPetStores(userLocation);
+        searchAnimalHospitals(userLocation);
+    }
+
+    // Search for veterinary care using Google Places API
+    function searchVeterinaryCare(location) {
+        const service = new google.maps.places.PlacesService(map);
+
+        const request = {
+            location: location,
+            radius: 10000, // 10km radius
+            type: 'veterinary_care'
+        };
+
+        service.nearbySearch(request, (results, status) => {
+            if (status === google.maps.places.PlacesServiceStatus.OK) {
+                console.log('✅ Found', results.length, 'veterinary care facilities');
+                processPlacesResults(results, 'hospital', 'red');
+            } else {
+                console.error('❌ Veterinary care search failed:', status);
+            }
+        });
+    }
+
+    // Search for pet stores using Google Places API
+    function searchPetStores(location) {
+        const service = new google.maps.places.PlacesService(map);
+
+        const request = {
+            location: location,
+            radius: 10000, // 10km radius
+            type: 'pet_store'
+        };
+
+        service.nearbySearch(request, (results, status) => {
+            if (status === google.maps.places.PlacesServiceStatus.OK) {
+                console.log('✅ Found', results.length, 'pet stores');
+                processPlacesResults(results, 'shop', 'yellow');
+            } else {
+                console.error('❌ Pet store search failed:', status);
+            }
+        });
+    }
+
+    // Search for animal hospitals using text search
+    function searchAnimalHospitals(location) {
+        const service = new google.maps.places.PlacesService(map);
+
+        const request = {
+            location: location,
+            radius: 10000,
+            query: 'animal hospital pet clinic veterinary Bangalore'
+        };
+
+        service.textSearch(request, (results, status) => {
+            if (status === google.maps.places.PlacesServiceStatus.OK) {
+                console.log('✅ Found', results.length, 'animal hospitals via text search');
+                processPlacesResults(results, 'hospital', 'red');
+            } else {
+                console.error('❌ Animal hospital search failed:', status);
+            }
+        });
+    }
+
+    // Process Google Places API results
+    function processPlacesResults(places, serviceType, markerColor) {
+        console.log(`Processing ${places.length} ${serviceType}s from Google Places`);
+
+        places.forEach(place => {
+            // Calculate distance using Google Maps geometry library
+            const userLocation = new google.maps.LatLng(userLatitude, userLongitude);
+            const serviceLocation = new google.maps.LatLng(
+                place.geometry.location.lat(),
+                place.geometry.location.lng()
+            );
+            const distance = google.maps.geometry.spherical.computeDistanceBetween(userLocation, serviceLocation);
+
+            // Convert Google Places data to our format
+            const service = {
+                place_id: place.place_id,
+                name: place.name,
+                address: place.vicinity || place.formatted_address || 'Address not available',
+                lat: place.geometry.location.lat(),
+                lng: place.geometry.location.lng(),
+                rating: place.rating || 'N/A',
+                type: serviceType,
+                markerColor: markerColor,
+                price_level: place.price_level || 'N/A',
+                user_ratings_total: place.user_ratings_total || 0,
+                business_status: place.business_status || 'OPERATIONAL',
+                photos: place.photos || [],
+                types: place.types || [],
+                realDistance: distance, // in meters
+                realDistanceText: (distance / 1000).toFixed(1) + ' km'
+            };
+
+            // Add marker to map
+            addGooglePlaceMarker(service);
+
+            // Add to services list for display
+            addServiceToList(service);
+        });
+
+        // Update success message
+        updateSuccessMessage();
+    }
+
+    // Add Google Place marker to map
+    function addGooglePlaceMarker(service) {
+        let iconUrl = '';
+
+        switch(service.markerColor) {
+            case 'red':
+                iconUrl = 'https://maps.google.com/mapfiles/ms/icons/red-dot.png';
+                break;
+            case 'green':
+                iconUrl = 'https://maps.google.com/mapfiles/ms/icons/green-dot.png';
+                break;
+            case 'yellow':
+                iconUrl = 'https://maps.google.com/mapfiles/ms/icons/yellow-dot.png';
+                break;
+            default:
+                iconUrl = 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png';
+        }
+
+        const marker = new google.maps.Marker({
+            position: { lat: service.lat, lng: service.lng },
+            map: map,
+            title: service.name,
+            icon: {
+                url: iconUrl,
+                scaledSize: new google.maps.Size(32, 32)
+            }
+        });
+
+        // Create info window with real Google Places data
+        const infoWindow = new google.maps.InfoWindow({
+            content: `
+                <div style="max-width: 300px;">
+                    <h6><strong>${service.name}</strong></h6>
+                    <p><i class="fas fa-map-marker-alt"></i> ${service.address}</p>
+                    <p><i class="fas fa-star"></i> Rating: ${service.rating}/5 (${service.user_ratings_total} reviews)</p>
+                    <p><i class="fas fa-route"></i> <strong>${service.realDistanceText}</strong> away</p>
+                    <p><i class="fas fa-tag"></i> Type: ${service.type}</p>
+                    <div class="mt-2">
+                        <button class="btn btn-sm btn-primary me-1" onclick="getDirectionsToPlace('${service.place_id}')">
+                            <i class="fas fa-directions"></i> Directions
+                        </button>
+                        <button class="btn btn-sm btn-info" onclick="getPlaceDetails('${service.place_id}')">
+                            <i class="fas fa-info"></i> Details
+                        </button>
+                    </div>
+                </div>
+            `
+        });
+
+        marker.addListener('click', () => {
+            infoWindow.open(map, marker);
+        });
+
+        serviceMarkers.push(marker);
+    }
+
+    // Global arrays to store found services
+    let foundHospitals = [];
+    let foundPharmacies = [];
+    let foundShops = [];
+
+    // Add service to appropriate list
+    function addServiceToList(service) {
+        if (service.type === 'hospital') {
+            foundHospitals.push(service);
+        } else if (service.type === 'pharmacy') {
+            foundPharmacies.push(service);
+        } else if (service.type === 'shop') {
+            foundShops.push(service);
+        }
+    }
+
+    // Update success message with current counts
+    function updateSuccessMessage() {
+        const totalServices = foundHospitals.length + foundPharmacies.length + foundShops.length;
+        if (totalServices > 0) {
+            hideLoadingMessage();
+            showSuccessMessage(`Found ${totalServices} real pet services near your location! (${foundHospitals.length} hospitals, ${foundPharmacies.length} pharmacies, ${foundShops.length} shops)`);
+
+            // Update the service sections
+            updateRealServiceSections();
+        }
+    }
+
+    // Update service sections with real Google Places data
+    function updateRealServiceSections() {
+        // Sort by distance
+        foundHospitals.sort((a, b) => a.realDistance - b.realDistance);
+        foundPharmacies.sort((a, b) => a.realDistance - b.realDistance);
+        foundShops.sort((a, b) => a.realDistance - b.realDistance);
+
+        // Update sections
+        updateGooglePlacesSection('hospitals', foundHospitals, 'Veterinary Hospitals');
+        updateGooglePlacesSection('pharmacies', foundPharmacies, 'Pet Pharmacies');
+        updateGooglePlacesSection('petshops', foundShops, 'Pet Stores');
+    }
+
+    // Button click handler
+    function getUserLocation() {
+        getUserLocationWithAPI();
+    }
+
+    // Get address using Google Geocoding API
+    function getAddressFromCoordinates(lat, lng) {
+        const geocoder = new google.maps.Geocoder();
+        const latlng = { lat: lat, lng: lng };
+
+        geocoder.geocode({ location: latlng }, (results, status) => {
+            if (status === 'OK') {
+                if (results[0]) {
+                    const address = results[0].formatted_address;
+                    document.getElementById('currentLocationText').textContent = address;
+                    document.getElementById('currentLocationDiv').classList.remove('current-location-hidden');
+                } else {
+                    document.getElementById('currentLocationText').textContent = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+                }
+            } else {
+                console.error('Geocoder failed:', status);
+                document.getElementById('currentLocationText').textContent = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+            }
+        });
+    }
+
+    // Find nearby services using our database and real distance calculation
+    function findNearbyServices() {
+        if (!userLatitude || !userLongitude) return;
+
+        console.log('Finding nearby services...');
+
+        // Clear existing service markers
+        serviceMarkers.forEach(marker => map.removeLayer(marker));
+        serviceMarkers = [];
+
+        // Show loading message
+        showLoadingMessage('Finding pet services near your location...');
+
+        // Use our database services and calculate real distances
+        findServicesAlternative();
+    }
+
+    // Search for real veterinary hospitals using Places API
+    function searchRealVeterinaryHospitals(location) {
+        const service = new google.maps.places.PlacesService(map);
+
+        const request = {
+            location: location,
+            radius: 10000, // 10km radius
+            type: 'veterinary_care',
+            keyword: 'veterinary hospital clinic animal doctor pet'
+        };
+
+        service.nearbySearch(request, (results, status) => {
+            if (status === google.maps.places.PlacesServiceStatus.OK) {
+                console.log('Found', results.length, 'veterinary hospitals');
+                processRealServices(results, 'hospital', 'red');
+            } else {
+                console.error('Veterinary search failed:', status);
+            }
+        });
+    }
+
+    // Search for real pet stores using Places API
+    function searchRealPetStores(location) {
+        const service = new google.maps.places.PlacesService(map);
+
+        const request = {
+            location: location,
+            radius: 10000, // 10km radius
+            type: 'pet_store',
+            keyword: 'pet store shop animal food toys accessories'
+        };
+
+        service.nearbySearch(request, (results, status) => {
+            if (status === google.maps.places.PlacesServiceStatus.OK) {
+                console.log('Found', results.length, 'pet stores');
+                processRealServices(results, 'shop', 'yellow');
+            } else {
+                console.error('Pet store search failed:', status);
+            }
+        });
+    }
+
+    // Search for real pet pharmacies using Places API
+    function searchRealPetPharmacies(location) {
+        const service = new google.maps.places.PlacesService(map);
+
+        // Search for pharmacies that might serve pets
+        const request = {
+            location: location,
+            radius: 10000, // 10km radius
+            type: 'pharmacy',
+            keyword: 'pet pharmacy animal medicine veterinary drugs'
+        };
+
+        service.nearbySearch(request, (results, status) => {
+            if (status === google.maps.places.PlacesServiceStatus.OK) {
+                console.log('Found', results.length, 'potential pet pharmacies');
+                processRealServices(results, 'pharmacy', 'green');
+            } else {
+                console.error('Pet pharmacy search failed:', status);
+            }
+        });
+    }
+
+    // Search for animal hospitals using text search
+    function searchRealAnimalHospitals(location) {
+        const service = new google.maps.places.PlacesService(map);
+
+        const request = {
+            location: location,
+            radius: 10000,
+            query: 'animal hospital pet clinic veterinary care Bangalore'
+        };
+
+        service.textSearch(request, (results, status) => {
+            if (status === google.maps.places.PlacesServiceStatus.OK) {
+                console.log('Found', results.length, 'animal hospitals via text search');
+                processRealServices(results, 'hospital', 'red');
+            } else {
+                console.error('Animal hospital text search failed:', status);
+            }
+        });
+    }
+
+    // Global array to store all found services
+    let foundServices = [];
+    let searchesCompleted = 0;
+    let totalSearches = 4; // veterinary, pet stores, pharmacies, animal hospitals
+
+    // Process real services from Google Places API
+    function processRealServices(places, serviceType, markerColor) {
+        console.log(`Processing ${places.length} ${serviceType}s from Google Places`);
+
+        places.forEach(place => {
+            // Convert Google Places data to our format
+            const service = {
+                place_id: place.place_id,
+                name: place.name,
+                address: place.vicinity || place.formatted_address || 'Address not available',
+                lat: place.geometry.location.lat(),
+                lng: place.geometry.location.lng(),
+                rating: place.rating || 'N/A',
+                type: serviceType,
+                markerColor: markerColor,
+                price_level: place.price_level || 'N/A',
+                user_ratings_total: place.user_ratings_total || 0,
+                business_status: place.business_status || 'OPERATIONAL',
+                photos: place.photos || [],
+                types: place.types || []
+            };
+
+            // Calculate distance using Google Maps geometry library
+            const userLocation = new google.maps.LatLng(userLatitude, userLongitude);
+            const serviceLocation = new google.maps.LatLng(service.lat, service.lng);
+            const distance = google.maps.geometry.spherical.computeDistanceBetween(userLocation, serviceLocation);
+
+            service.realDistance = distance; // in meters
+            service.realDistanceText = (distance / 1000).toFixed(1) + ' km';
+
+            foundServices.push(service);
+
+            // Add marker to map immediately
+            addRealServiceMarker(service);
+        });
+
+        searchesCompleted++;
+
+        // When all searches are complete, update the UI
+        if (searchesCompleted >= totalSearches) {
+            displayRealNearbyServices();
+        }
+    }
+
+    // Add marker for real service to map
+    function addRealServiceMarker(service) {
+        let iconUrl = '';
+
+        switch(service.markerColor) {
+            case 'red':
+                iconUrl = 'https://maps.google.com/mapfiles/ms/icons/red-dot.png';
+                break;
+            case 'green':
+                iconUrl = 'https://maps.google.com/mapfiles/ms/icons/green-dot.png';
+                break;
+            case 'yellow':
+                iconUrl = 'https://maps.google.com/mapfiles/ms/icons/yellow-dot.png';
+                break;
+            default:
+                iconUrl = 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png';
+        }
+
+        const marker = new google.maps.Marker({
+            position: { lat: service.lat, lng: service.lng },
+            map: map,
+            title: service.name,
+            icon: {
+                url: iconUrl,
+                scaledSize: new google.maps.Size(32, 32)
+            }
+        });
+
+        // Create info window with real Google Places data
+        const infoWindow = new google.maps.InfoWindow({
+            content: `
+                <div style="max-width: 300px;">
+                    <h6><strong>${service.name}</strong></h6>
+                    <p><i class="fas fa-map-marker-alt"></i> ${service.address}</p>
+                    <p><i class="fas fa-star"></i> Rating: ${service.rating}/5 (${service.user_ratings_total} reviews)</p>
+                    <p><i class="fas fa-route"></i> <strong>${service.realDistanceText}</strong> away</p>
+                    <p><i class="fas fa-tag"></i> Type: ${service.type}</p>
+                    <div class="mt-2">
+                        <button class="btn btn-sm btn-primary me-1" onclick="getDirectionsToPlace('${service.place_id}')">
+                            <i class="fas fa-directions"></i> Directions
+                        </button>
+                        <button class="btn btn-sm btn-info" onclick="getPlaceDetails('${service.place_id}')">
+                            <i class="fas fa-info"></i> Details
+                        </button>
+                    </div>
+                </div>
+            `
+        });
+
+        marker.addListener('click', () => {
+            infoWindow.open(map, marker);
+        });
+
+        serviceMarkers.push(marker);
+    }
+
+    // Display all found real services
+    function displayRealNearbyServices() {
+        console.log('Displaying all real nearby services:', foundServices.length);
+
+        // Sort by distance
+        foundServices.sort((a, b) => a.realDistance - b.realDistance);
+
+        // Group by type
+        const hospitals = foundServices.filter(s => s.type === 'hospital');
+        const pharmacies = foundServices.filter(s => s.type === 'pharmacy');
+        const shops = foundServices.filter(s => s.type === 'shop');
+
+        // Update the service lists in HTML
+        updateRealServiceLists(hospitals, pharmacies, shops);
+
+        // Hide loading message and show success
+        hideLoadingMessage();
+        showSuccessMessage(`Found ${foundServices.length} real pet services near your location!`);
+
+        console.log(`Breakdown: ${hospitals.length} hospitals, ${pharmacies.length} pharmacies, ${shops.length} shops`);
+    }
+
+    // Display nearby services (within 10km radius)
+    function displayNearbyServices(services) {
+        console.log('Displaying nearby services:', services.length);
+
+        // Filter services within 10km (10000 meters)
+        const nearbyServices = services.filter(service => service.realDistance <= 10000);
+
+        // Sort by distance
+        nearbyServices.sort((a, b) => a.realDistance - b.realDistance);
+
+        console.log('Services within 10km:', nearbyServices.length);
+
+        // Add markers to map
+        addServiceMarkersToMap(nearbyServices);
+
+        // Update the service lists in HTML
+        updateServiceLists(nearbyServices);
+
+        // Show success message
+        showSuccessMessage(`Found ${nearbyServices.length} pet services within 10km of your location!`);
+    }
+
+    // Add service markers to Google Map
+    function addServiceMarkersToMap(services) {
+        // Clear existing markers
+        serviceMarkers.forEach(marker => marker.setMap(null));
+        serviceMarkers = [];
+
+        services.forEach(service => {
+            let iconUrl = '';
+            let iconColor = '';
+
+            switch(service.type) {
+                case 'hospital':
+                    iconUrl = 'https://maps.google.com/mapfiles/ms/icons/red-dot.png';
+                    iconColor = 'red';
+                    break;
+                case 'pharmacy':
+                    iconUrl = 'https://maps.google.com/mapfiles/ms/icons/green-dot.png';
+                    iconColor = 'green';
+                    break;
+                case 'shop':
+                    iconUrl = 'https://maps.google.com/mapfiles/ms/icons/yellow-dot.png';
+                    iconColor = 'yellow';
+                    break;
+            }
+
+            const marker = new google.maps.Marker({
+                position: { lat: service.lat, lng: service.lng },
+                map: map,
+                title: service.name,
+                icon: {
+                    url: iconUrl,
+                    scaledSize: new google.maps.Size(32, 32)
+                }
+            });
+
+            // Add info window
+            const infoWindow = new google.maps.InfoWindow({
+                content: `
+                    <div style="max-width: 250px;">
+                        <h6><strong>${service.name}</strong></h6>
+                        <p><i class="fas fa-map-marker-alt"></i> ${service.address}</p>
+                        <p><i class="fas fa-phone"></i> ${service.phone}</p>
+                        <p><i class="fas fa-route"></i> <strong>${service.realDistanceText}</strong> away</p>
+                        <p><i class="fas fa-clock"></i> ${service.duration || 'N/A'} drive</p>
+                        <div class="mt-2">
+                            <button class="btn btn-sm btn-primary me-1" onclick="getDirections(${service.lat}, ${service.lng}, '${service.name}')">
+                                Directions
+                            </button>
+                            <button class="btn btn-sm btn-success" onclick="callPlace('${service.phone}')">
+                                Call
+                            </button>
+                        </div>
+                    </div>
+                `
+            });
+
+            marker.addListener('click', () => {
+                infoWindow.open(map, marker);
+            });
+
+            serviceMarkers.push(marker);
+        });
+    }
+
+    // Update service lists with REAL Google Places data
+    function updateRealServiceLists(hospitals, pharmacies, shops) {
+        console.log('Updating UI with real services...');
+
+        // Update hospitals section
+        updateRealServiceSection('hospitals', hospitals, 'Veterinary Hospitals');
+        updateRealServiceSection('pharmacies', pharmacies, 'Pet Pharmacies');
+        updateRealServiceSection('petshops', shops, 'Pet Stores');
+    }
+
+    // Update individual service section with real data
+    function updateRealServiceSection(sectionId, services, sectionTitle) {
+        const section = document.getElementById(sectionId);
+        if (!section) return;
+
+        const container = section.querySelector('.row') || section;
+        container.innerHTML = '';
+
+        if (services.length === 0) {
+            container.innerHTML = `
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        No ${sectionTitle.toLowerCase()} found within 10km of your location.
+                        <br><small>Try expanding your search radius or check a different area.</small>
+                    </div>
+                </div>
+            `;
+            return;
+        }
+
+        // Add section header
+        const headerDiv = document.createElement('div');
+        headerDiv.className = 'col-12 mb-3';
+        headerDiv.innerHTML = `
+            <h4><i class="fas fa-map-marker-alt me-2"></i>${sectionTitle} Near You (${services.length} found)</h4>
+            <p class="text-muted">Real businesses found using Google Places API, sorted by distance</p>
+        `;
+        container.appendChild(headerDiv);
+
+        services.forEach(service => {
+            const serviceCard = createRealServiceCard(service);
+            container.appendChild(serviceCard);
+        });
+    }
+
+    // Create service card for real Google Places data
+    function createRealServiceCard(service) {
+        const col = document.createElement('div');
+        col.className = 'col-md-6 col-lg-4 mb-4';
+
+        // Determine service icon
+        let serviceIcon = 'fas fa-building';
+        if (service.type === 'hospital') serviceIcon = 'fas fa-hospital';
+        else if (service.type === 'pharmacy') serviceIcon = 'fas fa-pills';
+        else if (service.type === 'shop') serviceIcon = 'fas fa-store';
+
+        // Create price level display
+        let priceDisplay = '';
+        if (service.price_level && service.price_level !== 'N/A') {
+            const dollarSigns = '$'.repeat(service.price_level);
+            priceDisplay = `<span class="badge bg-warning text-dark">${dollarSigns}</span>`;
+        }
+
+        // Business status badge
+        let statusBadge = '';
+        if (service.business_status === 'OPERATIONAL') {
+            statusBadge = '<span class="badge bg-success">Open</span>';
+        } else if (service.business_status === 'CLOSED_TEMPORARILY') {
+            statusBadge = '<span class="badge bg-warning">Temporarily Closed</span>';
+        } else if (service.business_status === 'CLOSED_PERMANENTLY') {
+            statusBadge = '<span class="badge bg-danger">Permanently Closed</span>';
+        }
+
+        col.innerHTML = `
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="${serviceIcon} me-2 text-primary"></i>
+                        ${service.name}
+                    </h5>
+                    <p class="card-text">
+                        <i class="fas fa-map-marker-alt me-2 text-muted"></i>
+                        <small>${service.address}</small>
+                    </p>
+
+                    <div class="mb-2">
+                        <span class="badge bg-primary me-1">
+                            <i class="fas fa-route me-1"></i>${service.realDistanceText}
+                        </span>
+                        ${statusBadge}
+                        ${priceDisplay}
+                    </div>
+
+                    <div class="mb-2">
+                        <i class="fas fa-star text-warning me-1"></i>
+                        <strong>${service.rating}</strong>/5
+                        <small class="text-muted">(${service.user_ratings_total} reviews)</small>
+                    </div>
+
+                    <div class="mb-2">
+                        <small class="text-muted">
+                            <i class="fas fa-tag me-1"></i>
+                            ${service.types.slice(0, 3).join(', ')}
+                        </small>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-transparent">
+                    <div class="d-grid gap-2 d-md-flex">
+                        <button type="button" class="btn btn-primary btn-sm" onclick="getDirectionsToPlace('${service.place_id}')">
+                            <i class="fas fa-directions me-1"></i>Directions
+                        </button>
+                        <button type="button" class="btn btn-info btn-sm" onclick="getPlaceDetails('${service.place_id}')">
+                            <i class="fas fa-info me-1"></i>Details
+                        </button>
+                        <button type="button" class="btn btn-success btn-sm" onclick="callPlace('${service.place_id}')">
+                            <i class="fas fa-phone me-1"></i>Call
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        return col;
+    }
+
+    // Get directions to a Google Place
+    function getDirectionsToPlace(placeId) {
+        if (userLatitude && userLongitude) {
+            const url = `https://www.google.com/maps/dir/${userLatitude},${userLongitude}/place_id:${placeId}`;
+            window.open(url, '_blank');
+        } else {
+            const url = `https://www.google.com/maps/place/?q=place_id:${placeId}`;
+            window.open(url, '_blank');
+        }
+    }
+
+    // Get detailed information about a place
+    function getPlaceDetails(placeId) {
+        const service = new google.maps.places.PlacesService(map);
+
+        const request = {
+            placeId: placeId,
+            fields: ['name', 'formatted_address', 'formatted_phone_number', 'website', 'opening_hours', 'photos', 'reviews']
+        };
+
+        service.getDetails(request, (place, status) => {
+            if (status === google.maps.places.PlacesServiceStatus.OK) {
+                showPlaceDetailsModal(place);
+            } else {
+                alert('Could not retrieve place details. Please try again.');
+            }
+        });
+    }
+
+    // Show place details in a modal
+    function showPlaceDetailsModal(place) {
+        const modal = document.createElement('div');
+        modal.className = 'modal fade';
+        modal.innerHTML = `
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">${place.name}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p><strong>Address:</strong> ${place.formatted_address || 'Not available'}</p>
+                        <p><strong>Phone:</strong> ${place.formatted_phone_number || 'Not available'}</p>
+                        <p><strong>Website:</strong> ${place.website ? `<a href="${place.website}" target="_blank">${place.website}</a>` : 'Not available'}</p>
+
+                        ${place.opening_hours ? `
+                            <div class="mb-3">
+                                <strong>Opening Hours:</strong>
+                                <ul class="list-unstyled">
+                                    ${place.opening_hours.weekday_text.map(day => `<li>${day}</li>`).join('')}
+                                </ul>
+                            </div>
+                        ` : ''}
+
+                        ${place.reviews && place.reviews.length > 0 ? `
+                            <div class="mb-3">
+                                <strong>Recent Reviews:</strong>
+                                ${place.reviews.slice(0, 3).map(review => `
+                                    <div class="border-bottom py-2">
+                                        <div class="d-flex justify-content-between">
+                                            <strong>${review.author_name}</strong>
+                                            <span>${'★'.repeat(review.rating)}${'☆'.repeat(5-review.rating)}</span>
+                                        </div>
+                                        <p class="mb-0">${review.text}</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" onclick="getDirectionsToPlace('${place.place_id}')">Get Directions</button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+        const bootstrapModal = new bootstrap.Modal(modal);
+        bootstrapModal.show();
+
+        // Remove modal from DOM when hidden
+        modal.addEventListener('hidden.bs.modal', () => {
+            document.body.removeChild(modal);
+        });
+    }
+
+    // Show/hide loading message
+    function showLoadingMessage(message) {
+        const statusDiv = document.getElementById('locationStatus');
+        statusDiv.classList.remove('manual-location-hidden');
+        statusDiv.className = 'alert alert-info';
+        statusDiv.innerHTML = `
+            <i class="fas fa-spinner fa-spin me-2"></i>
+            <strong>${message}</strong><br>
+            <small>This may take a few seconds...</small>
+        `;
+    }
+
+    function hideLoadingMessage() {
+        const statusDiv = document.getElementById('locationStatus');
+        statusDiv.classList.add('manual-location-hidden');
+    }
+
+    // Update individual service section
+    function updateServiceSection(sectionId, services, type) {
+        const section = document.getElementById(sectionId);
+        if (!section) return;
+
+        const container = section.querySelector('.row') || section;
+        container.innerHTML = '';
+
+        if (services.length === 0) {
+            container.innerHTML = `
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        No ${type}s found within 10km of your location.
+                    </div>
+                </div>
+            `;
+            return;
+        }
+
+        services.forEach(service => {
+            const serviceCard = createServiceCard(service, type);
+            container.appendChild(serviceCard);
+        });
+    }
+
+    // Create service card HTML
+    function createServiceCard(service, type) {
+        const col = document.createElement('div');
+        col.className = 'col-md-6 col-lg-4 mb-4';
+
+        col.innerHTML = `
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">${service.name}</h5>
+                    <p class="card-text">
+                        <i class="fas fa-map-marker-alt me-2"></i>${service.address}
+                    </p>
+                    <p class="card-text">
+                        <i class="fas fa-phone me-2"></i>${service.phone}
+                    </p>
+                    <p class="card-text">
+                        <i class="fas fa-star me-2"></i>Rating: ${service.rating}/5
+                    </p>
+
+                    <div class="mb-2">
+                        <span class="badge bg-success me-1">
+                            <i class="fas fa-route me-1"></i>${service.realDistanceText}
+                        </span>
+                        <span class="badge bg-info">
+                            <i class="fas fa-clock me-1"></i>${service.duration || 'N/A'}
+                        </span>
+                    </div>
+
+                    <div class="mb-2">
+                        ${service.services.map(s => `<span class="badge bg-secondary me-1">${s}</span>`).join('')}
+                    </div>
+
+                    <p class="card-text">
+                        <small class="text-muted">
+                            <i class="fas fa-clock me-1"></i>${service.timings}
+                        </small>
+                    </p>
+                </div>
+
+                <div class="card-footer">
+                    <div class="d-grid gap-2 d-md-flex">
+                        <button type="button" class="btn btn-primary" onclick="getDirections(${service.lat}, ${service.lng}, '${service.name}')">
+                            <i class="fas fa-directions me-1"></i>Directions
+                        </button>
+                        <button type="button" class="btn btn-success" onclick="callPlace('${service.phone}')">
+                            <i class="fas fa-phone me-1"></i>Call
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        return col;
+    }
+
+    // Show success message
+    function showSuccessMessage(message) {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-success alert-dismissible fade show mt-3';
+        alertDiv.innerHTML = `
+            <i class="fas fa-check-circle me-2"></i>${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+
+        const container = document.querySelector('.container');
+        const firstCard = container.querySelector('.card');
+        container.insertBefore(alertDiv, firstCard.nextSibling);
+
+        // Auto-dismiss after 5 seconds
+        setTimeout(() => {
+            if (alertDiv.parentNode) {
+                alertDiv.remove();
+            }
+        }, 5000);
+    }
+
+    // Update Google Places section
+    function updateGooglePlacesSection(sectionId, services, sectionTitle) {
+        const section = document.getElementById(sectionId);
+        if (!section) return;
+
+        const container = section.querySelector('.row') || section;
+        container.innerHTML = '';
+
+        if (services.length === 0) {
+            container.innerHTML = `
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        No ${sectionTitle.toLowerCase()} found within 10km of your location.
+                    </div>
+                </div>
+            `;
+            return;
+        }
+
+        // Add section header
+        const headerDiv = document.createElement('div');
+        headerDiv.className = 'col-12 mb-3';
+        headerDiv.innerHTML = `
+            <h4><i class="fas fa-map-marker-alt me-2"></i>${sectionTitle} Near You (${services.length} found)</h4>
+            <p class="text-muted">Real businesses from Google Places API, sorted by distance</p>
+        `;
+        container.appendChild(headerDiv);
+
+        services.forEach(service => {
+            const serviceCard = createGooglePlaceCard(service);
+            container.appendChild(serviceCard);
+        });
+    }
+
+    // Create service card for Google Places data
+    function createGooglePlaceCard(service) {
+        const col = document.createElement('div');
+        col.className = 'col-md-6 col-lg-4 mb-4';
+
+        // Determine service icon
+        let serviceIcon = 'fas fa-building';
+        if (service.type === 'hospital') serviceIcon = 'fas fa-hospital';
+        else if (service.type === 'pharmacy') serviceIcon = 'fas fa-pills';
+        else if (service.type === 'shop') serviceIcon = 'fas fa-store';
+
+        // Business status badge
+        let statusBadge = '';
+        if (service.business_status === 'OPERATIONAL') {
+            statusBadge = '<span class="badge bg-success">Open</span>';
+        } else if (service.business_status === 'CLOSED_TEMPORARILY') {
+            statusBadge = '<span class="badge bg-warning">Temporarily Closed</span>';
+        } else if (service.business_status === 'CLOSED_PERMANENTLY') {
+            statusBadge = '<span class="badge bg-danger">Permanently Closed</span>';
+        }
+
+        col.innerHTML = `
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="${serviceIcon} me-2 text-primary"></i>
+                        ${service.name}
+                    </h5>
+                    <p class="card-text">
+                        <i class="fas fa-map-marker-alt me-2 text-muted"></i>
+                        <small>${service.address}</small>
+                    </p>
+
+                    <div class="mb-2">
+                        <span class="badge bg-primary me-1">
+                            <i class="fas fa-route me-1"></i>${service.realDistanceText}
+                        </span>
+                        ${statusBadge}
+                    </div>
+
+                    <div class="mb-2">
+                        <i class="fas fa-star text-warning me-1"></i>
+                        <strong>${service.rating}</strong>/5
+                        <small class="text-muted">(${service.user_ratings_total} reviews)</small>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-transparent">
+                    <div class="d-grid gap-2 d-md-flex">
+                        <button type="button" class="btn btn-primary btn-sm" onclick="getDirectionsToPlace('${service.place_id}')">
+                            <i class="fas fa-directions me-1"></i>Directions
+                        </button>
+                        <button type="button" class="btn btn-info btn-sm" onclick="getPlaceDetails('${service.place_id}')">
+                            <i class="fas fa-info me-1"></i>Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        return col;
+    }
+
+    // Get directions to a Google Place
+    function getDirectionsToPlace(placeId) {
+        if (userLatitude && userLongitude) {
+            const url = `https://www.google.com/maps/dir/${userLatitude},${userLongitude}/place_id:${placeId}`;
+            window.open(url, '_blank');
+        } else {
+            const url = `https://www.google.com/maps/place/?q=place_id:${placeId}`;
+            window.open(url, '_blank');
+        }
+    }
+
+    // SIMPLE demo location that WORKS
+    function useDemoLocation() {
+        console.log('Using demo location...');
+
+        // Hide loading
+        document.getElementById('locationStatus').classList.add('manual-location-hidden');
+
+        // Set demo coordinates (Koramangala)
+        userLatitude = 12.9352;
+        userLongitude = 77.6245;
+
+        // Update map
+        map.setView([userLatitude, userLongitude], 14);
+
+        // Add simple marker
+        if (userMarker) map.removeLayer(userMarker);
+        userMarker = L.marker([userLatitude, userLongitude])
+            .addTo(map)
+            .bindPopup('Demo Location - Koramangala')
+            .openPopup();
+
+        // Show location
+        document.getElementById('currentLocationText').textContent = 'Demo: Koramangala, Bangalore';
+        document.getElementById('currentLocationDiv').classList.remove('current-location-hidden');
+
+        // Find services
+        findNearbyServicesWithLocation();
+
+        alert('✅ Demo location set! Finding nearby services...');
+    }
+
+    // Straight line distance calculation (fallback)
+    function calculateStraightLineDistance(lat1, lng1, lat2, lng2) {
+        const R = 6371; // Earth's radius in km
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLng = (lng2 - lng1) * Math.PI / 180;
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                  Math.sin(dLng/2) * Math.sin(dLng/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return R * c;
+    }
+
+    // Calculate distance between two points
+    function calculateDistance(lat1, lng1, lat2, lng2) {
+        const R = 6371; // Earth's radius in km
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLng = (lng2 - lng1) * Math.PI / 180;
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                  Math.sin(dLng/2) * Math.sin(dLng/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return R * c;
+    }
+
+    // Update all distances
+    function updateAllDistances() {
+        if (!userLatitude || !userLongitude) return;
+
+        // Update hospitals
+        allServices.hospitals.forEach(service => {
+            service.calculatedDistance = calculateDistance(userLatitude, userLongitude, service.lat, service.lng);
+        });
+        allServices.hospitals.sort((a, b) => a.calculatedDistance - b.calculatedDistance);
+
+        // Update pharmacies
+        allServices.pharmacies.forEach(service => {
+            service.calculatedDistance = calculateDistance(userLatitude, userLongitude, service.lat, service.lng);
+        });
+        allServices.pharmacies.sort((a, b) => a.calculatedDistance - b.calculatedDistance);
+
+        // Update shops
+        allServices.shops.forEach(service => {
+            service.calculatedDistance = calculateDistance(userLatitude, userLongitude, service.lat, service.lng);
+        });
+        allServices.shops.sort((a, b) => a.calculatedDistance - b.calculatedDistance);
+
+        // Update the UI
+        updateServiceCards();
+    }
+
+    // Update service cards with new distances
+    function updateServiceCards() {
+        // Update distance badges
+        const hospitalBadges = document.querySelectorAll('#hospitals .badge.bg-success');
+        allServices.hospitals.forEach((hospital, index) => {
+            if (hospitalBadges[index]) {
+                hospitalBadges[index].textContent = `${hospital.calculatedDistance.toFixed(1)} km`;
+            }
+        });
+
+        const pharmacyBadges = document.querySelectorAll('#pharmacies .badge.bg-success');
+        allServices.pharmacies.forEach((pharmacy, index) => {
+            if (pharmacyBadges[index]) {
+                pharmacyBadges[index].textContent = `${pharmacy.calculatedDistance.toFixed(1)} km`;
+            }
+        });
+
+        const shopBadges = document.querySelectorAll('#petshops .badge.bg-success');
+        allServices.shops.forEach((shop, index) => {
+            if (shopBadges[index]) {
+                shopBadges[index].textContent = `${shop.calculatedDistance.toFixed(1)} km`;
+            }
+        });
+    }
+
+    // Toggle manual search
+    function toggleManualSearch() {
+        const manualDiv = document.getElementById('manualLocationDiv');
+        manualDiv.classList.toggle('manual-location-hidden');
+    }
+
+    // Search by address
+    function searchByAddress() {
+        const address = document.getElementById('locationInput').value.trim();
+        if (!address) {
+            alert('Please enter an address');
+            return;
+        }
+
+        // North Bangalore areas mapping
+        const areas = {
+            // Specific requested areas
+            'mathikere': { lat: 13.0358, lng: 77.5700 },
+            'sanjay nagar': { lat: 13.0250, lng: 77.5850 },
+            'yelahanka': { lat: 13.1007, lng: 77.5963 },
+            'hebbal': { lat: 13.0358, lng: 77.5970 },
+            'r t nagar': { lat: 13.0200, lng: 77.5950 },
+            'rt nagar': { lat: 13.0200, lng: 77.5950 },
+            'nagavara': { lat: 13.0450, lng: 77.6100 },
+            'rmv 2nd stage': { lat: 13.0150, lng: 77.5800 },
+            'rmv': { lat: 13.0150, lng: 77.5800 },
+            'sadashiv nagar': { lat: 13.0100, lng: 77.5750 },
+            'cbi bus stop': { lat: 13.0400, lng: 77.5950 },
+            'cbi': { lat: 13.0400, lng: 77.5950 },
+
+            // Additional common areas
+            'koramangala': { lat: 12.9352, lng: 77.6245 },
+            'indiranagar': { lat: 12.9716, lng: 77.6412 },
+            'whitefield': { lat: 12.9698, lng: 77.7500 },
+            'jayanagar': { lat: 12.9279, lng: 77.5937 },
+            'jp nagar': { lat: 12.8956, lng: 77.5850 },
+            'hsr layout': { lat: 12.9116, lng: 77.6400 }
+        };
+
+        const searchKey = address.toLowerCase();
+        let found = false;
+
+        for (const [area, coords] of Object.entries(areas)) {
+            if (searchKey.includes(area)) {
+                userLatitude = coords.lat;
+                userLongitude = coords.lng;
+                found = true;
+                break;
+            }
+        }
+
+        if (found) {
+            document.getElementById('currentLocationText').textContent = address;
+            document.getElementById('currentLocationDiv').classList.remove('current-location-hidden');
+            updateAllDistances();
+            alert(`Location set to ${address}! Services sorted by distance.`);
+        } else {
+            alert('Area not found. Try: Mathikere, Sanjay Nagar, Yelahanka, Hebbal, R T Nagar, Nagavara, RMV 2nd Stage, Sadashiv Nagar, Koramangala, Indiranagar');
+        }
+    }
+
+    // Get directions
+    function getDirections(lat, lng, placeName) {
+        if (userLatitude && userLongitude) {
+            const url = `https://www.google.com/maps/dir/${userLatitude},${userLongitude}/${lat},${lng}`;
+            window.open(url, '_blank');
+        } else {
+            const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+            window.open(url, '_blank');
+        }
+    }
+
+    // Call place
+    function callPlace(phoneNumber) {
+        window.location.href = `tel:${phoneNumber}`;
+    }
+
+    // Refresh location
+    function refreshLocation() {
+        getUserLocation();
+    }
+
+
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Nearby Services page loaded');
+        console.log('Geolocation supported:', !!navigator.geolocation);
+
+        // Initialize services data from hidden elements
+        try {
+            const hospitalsData = document.getElementById('hospitals-data');
+            const pharmaciesData = document.getElementById('pharmacies-data');
+            const shopsData = document.getElementById('shops-data');
+
+            if (hospitalsData) allServices.hospitals = JSON.parse(hospitalsData.textContent);
+            if (pharmaciesData) allServices.pharmacies = JSON.parse(pharmaciesData.textContent);
+            if (shopsData) allServices.shops = JSON.parse(shopsData.textContent);
+
+            console.log('Services loaded:', allServices);
+        } catch (error) {
+            console.error('Error loading services data:', error);
+        }
+
+        // Initialize the map
+        initMap();
+
+        const statusDiv = document.getElementById('locationStatus');
+        statusDiv.classList.remove('manual-location-hidden');
+        statusDiv.className = 'alert alert-info';
+        statusDiv.innerHTML = `
+            <i class="fas fa-info-circle me-2"></i>
+            <strong>Welcome to Nearby Services!</strong><br>
+            <small>Click "Use My Current Location" to find services near you, or use "Use Demo Location" to test with Koramangala location.</small>
+        `;
+
+        console.log('Page ready. Map initialized.');
+    });
+</script>
+
+<!-- Hidden data elements for JavaScript -->
+<script type="application/json" id="hospitals-data">{{ veterinary_hospitals | tojson }}</script>
+<script type="application/json" id="pharmacies-data">{{ pet_pharmacies | tojson }}</script>
+<script type="application/json" id="shops-data">{{ pet_shops | tojson }}</script>
+
+{% endblock %}

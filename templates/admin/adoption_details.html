@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}Adoption Application Details - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="fas fa-heart me-2"></i>Adoption Application #{{ adoption.id }}</h1>
+        <div>
+            <a href="{{ url_for('admin_adoptions') }}" class="btn btn-outline-secondary me-2">
+                <i class="fas fa-arrow-left me-1"></i>Back to Applications
+            </a>
+            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-primary">
+                <i class="fas fa-home me-1"></i>Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="row">
+        <!-- Application Status -->
+        <div class="col-md-12 mb-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Application Status</h5>
+                    <span class="badge bg-{{ 'warning' if adoption.application_status == 'pending' else 'success' if adoption.application_status == 'approved' else 'danger' }} fs-6">
+                        {{ adoption.application_status|title }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Application Date:</strong> {{ adoption.application_date }}</p>
+                            <p><strong>Pet:</strong> {{ adoption.pet_name }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <form method="POST" action="{{ url_for('admin_update_adoption_status', adoption_id=adoption.id) }}" class="d-flex gap-2">
+                                <select name="status" class="form-select">
+                                    <option value="pending" {{ 'selected' if adoption.application_status == 'pending' else '' }}>Pending</option>
+                                    <option value="approved" {{ 'selected' if adoption.application_status == 'approved' else '' }}>Approved</option>
+                                    <option value="rejected" {{ 'selected' if adoption.application_status == 'rejected' else '' }}>Rejected</option>
+                                </select>
+                                <button type="submit" class="btn btn-primary">Update</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Applicant Information -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-user me-2"></i>Applicant Information</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <td><strong>Name:</strong></td>
+                            <td>{{ adoption.applicant_name }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Email:</strong></td>
+                            <td><a href="mailto:{{ adoption.email }}">{{ adoption.email }}</a></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Phone:</strong></td>
+                            <td><a href="tel:{{ adoption.phone }}">{{ adoption.phone }}</a></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Address:</strong></td>
+                            <td>{{ adoption.address }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Living Situation:</strong></td>
+                            <td>{{ adoption.living_situation }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Household Members:</strong></td>
+                            <td>{{ adoption.household_members or 'Not specified' }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pet Experience & Details -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-paw me-2"></i>Pet Experience & Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6>Experience with Pets:</h6>
+                        <p class="text-muted">{{ adoption.experience_with_pets or 'No experience mentioned' }}</p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h6>Other Pets at Home:</h6>
+                        <p class="text-muted">{{ adoption.other_pets or 'No other pets mentioned' }}</p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h6>Why do they want to adopt?</h6>
+                        <p class="text-muted">{{ adoption.why_adopt }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Actions -->
+        <div class="col-md-12 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-phone me-2"></i>Contact Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-2">
+                            <a href="mailto:{{ adoption.email }}?subject=Regarding your adoption application for {{ adoption.pet_name }}&body=Dear {{ adoption.applicant_name }},%0D%0A%0D%0AThank you for your interest in adopting {{ adoption.pet_name }}.%0D%0A%0D%0ABest regards,%0D%0APetCare Companion Team" 
+                               class="btn btn-primary w-100">
+                                <i class="fas fa-envelope me-2"></i>Send Email
+                            </a>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <a href="tel:{{ adoption.phone }}" class="btn btn-success w-100">
+                                <i class="fas fa-phone me-2"></i>Call Applicant
+                            </a>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <a href="https://wa.me/{{ adoption.phone.replace('+', '').replace('-', '').replace(' ', '') }}?text=Hi {{ adoption.applicant_name }}, this is regarding your adoption application for {{ adoption.pet_name }}." 
+                               target="_blank" class="btn btn-success w-100">
+                                <i class="fab fa-whatsapp me-2"></i>WhatsApp
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Notes -->
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-sticky-note me-2"></i>Admin Notes</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('admin_update_adoption_status', adoption_id=adoption.id) }}">
+                        <div class="mb-3">
+                            <textarea class="form-control" name="notes" rows="4" placeholder="Add notes about this application...">{{ adoption.notes or '' }}</textarea>
+                        </div>
+                        <input type="hidden" name="status" value="{{ adoption.application_status }}">
+                        <button type="submit" class="btn btn-secondary">Save Notes</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

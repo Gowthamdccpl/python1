@@ -1,0 +1,178 @@
+{
+  "summer": {
+    "title": "Summer Pet Care in Bangalore",
+    "intro": "As temperatures rise in Bangalore, keep your pets cool and comfortable with these essential tips to beat the heat.",
+    "banner_image": "summer_banner.jpg",
+    "theme_color": "#FF9E44",
+    "season_months": "March to May",
+    "tips": [
+      {
+        "title": "Prevent Heat Stroke",
+        "content": "Watch for excessive panting, drooling, and lethargy. Keep pets in cool, shaded areas and never leave them in parked vehicles. Provide constant access to fresh water and consider cooling mats or vests for extreme heat.",
+        "image": "summer_heatstroke.jpg",
+        "icon": "fas fa-thermometer-full"
+      },
+      {
+        "title": "Summer Grooming Guide",
+        "content": "Regular grooming helps pets stay cool. Consider a summer trim for long-haired breeds, but never shave double-coated breeds as their coat provides insulation. Brush frequently to remove loose fur and prevent matting.",
+        "image": "summer_grooming.jpg",
+        "icon": "fas fa-cut"
+      },
+      {
+        "title": "Hydration Strategies",
+        "content": "Place multiple water bowls around your home. Add ice cubes to water bowls to keep water cool longer. Consider pet water fountains to encourage drinking. Feed wet food to increase moisture intake.",
+        "image": "summer_hydration.jpg",
+        "icon": "fas fa-tint"
+      },
+      {
+        "title": "Dealing with Summer Pests",
+        "content": "Ticks, fleas, and mosquitoes thrive in Bangalore's summer. Use vet-recommended preventatives, check pets after outdoor activities, and keep your home clean to prevent infestations.",
+        "image": "summer_pests.jpg",
+        "icon": "fas fa-bug"
+      },
+      {
+        "title": "Safe Summer Activities",
+        "content": "Walk pets during early morning or late evening when temperatures are cooler. Try indoor games like hide and seek or puzzle toys. Visit pet-friendly malls or cafes with air conditioning for outings.",
+        "image": "summer_activities.jpg",
+        "icon": "fas fa-walking"
+      }
+    ],
+    "emergency_info": {
+      "title": "Summer Emergency Signs",
+      "content": "If your pet shows excessive drooling, difficulty breathing, vomiting, or collapse, seek veterinary care immediately. These could be signs of heat stroke, which is life-threatening.",
+      "contact": "Emergency Vet Helpline: 080-2345-6789"
+    }
+  },
+  "monsoon": {
+    "title": "Monsoon Pet Care in Bangalore",
+    "intro": "During Bangalore's rainy season, protect your pets from the challenges of wet weather with these monsoon-specific care tips.",
+    "banner_image": "monsoon_banner.jpg",
+    "theme_color": "#4682B4",
+    "season_months": "June to September",
+    "tips": [
+      {
+        "title": "Preventing Fungal Infections",
+        "content": "Dry your pet thoroughly after walks, paying special attention to paws, belly, and ears. Use pet-safe antifungal powders in areas prone to moisture. Watch for signs of infection like redness, itching, or unusual odor.",
+        "image": "monsoon_fungal.jpg",
+        "icon": "fas fa-shower"
+      },
+      {
+        "title": "Paw Care for Wet Conditions",
+        "content": "Trim the fur between paw pads to prevent mud accumulation. Consider pet booties for walks in heavy rain. Apply paw balm before walks to create a protective barrier against dirty water.",
+        "image": "monsoon_paws.jpg",
+        "icon": "fas fa-paw"
+      },
+      {
+        "title": "Indoor Exercise Ideas",
+        "content": "Create indoor obstacle courses, play tug-of-war, or try hide and seek with treats. Use puzzle toys to provide mental stimulation. Set up indoor fetch games with soft toys in hallways.",
+        "image": "monsoon_exercise.jpg",
+        "icon": "fas fa-running"
+      },
+      {
+        "title": "Mosquito-Borne Disease Prevention",
+        "content": "Consult your vet about heartworm prevention. Use pet-safe mosquito repellents. Eliminate standing water around your home. Keep pets indoors during dawn and dusk when mosquitoes are most active.",
+        "image": "monsoon_mosquito.jpg",
+        "icon": "fas fa-syringe"
+      },
+      {
+        "title": "Thunderstorm Anxiety Management",
+        "content": "Create a safe space for your pet during storms. Use white noise or calming music to mask thunder sounds. Consider anxiety wraps or vests. For severe cases, consult your vet about anti-anxiety solutions.",
+        "image": "monsoon_anxiety.jpg",
+        "icon": "fas fa-bolt"
+      }
+    ],
+    "emergency_info": {
+      "title": "Monsoon Emergency Signs",
+      "content": "Watch for signs of leptospirosis (fever, vomiting, jaundice) which can be contracted from contaminated water. Also monitor for signs of skin infections that can develop quickly in humid conditions.",
+      "contact": "Emergency Vet Helpline: 080-2345-6789"
+    }
+  },
+  "autumn": {
+    "title": "Post-Monsoon Pet Care in Bangalore",
+    "intro": "As the rains subside, help your pet transition to the post-monsoon season with these specialized care tips for Bangalore's autumn months.",
+    "banner_image": "autumn_banner.jpg",
+    "theme_color": "#D2691E",
+    "season_months": "October to November",
+    "tips": [
+      {
+        "title": "Post-Monsoon Health Check",
+        "content": "Schedule a vet visit to check for lingering monsoon-related issues like skin infections or parasites. Update vaccinations if needed. Check ears for signs of infection that may have developed during the humid season.",
+        "image": "autumn_health.jpg",
+        "icon": "fas fa-stethoscope"
+      },
+      {
+        "title": "Managing Seasonal Allergies",
+        "content": "Watch for excessive scratching, licking, or red skin which may indicate allergies. Wipe paws after walks to remove allergens. Consider air purifiers for your home. Consult your vet about antihistamines if symptoms are severe.",
+        "image": "autumn_allergies.jpg",
+        "icon": "fas fa-lungs"
+      },
+      {
+        "title": "Reviving Outdoor Activities",
+        "content": "Gradually increase exercise duration as the weather improves. Explore Bangalore's parks like Cubbon Park or Lalbagh during the pleasant post-monsoon weather. Join weekend pet meetups that resume after the rainy season.",
+        "image": "autumn_outdoors.jpg",
+        "icon": "fas fa-tree"
+      },
+      {
+        "title": "Home Cleaning for Pet Health",
+        "content": "Deep clean pet bedding and toys to remove monsoon mold and mildew. Check for damp areas in your home that could affect pet health. Consider dehumidifiers in areas that remain damp after the monsoon.",
+        "image": "autumn_cleaning.jpg",
+        "icon": "fas fa-broom"
+      },
+      {
+        "title": "Nutrition Transition Tips",
+        "content": "Adjust food portions as activity levels increase. Consider adding immune-boosting supplements like omega-3 fatty acids. Ensure proper hydration even as temperatures become more comfortable.",
+        "image": "autumn_nutrition.jpg",
+        "icon": "fas fa-utensils"
+      }
+    ],
+    "emergency_info": {
+      "title": "Post-Monsoon Warning Signs",
+      "content": "Monitor for persistent coughing or respiratory issues that could indicate fungal infections developed during monsoon. Also watch for signs of tick-borne diseases that may manifest after monsoon exposure.",
+      "contact": "Emergency Vet Helpline: 080-2345-6789"
+    }
+  },
+  "winter": {
+    "title": "Winter Pet Care in Bangalore",
+    "intro": "Even in Bangalore's mild winter, pets may need special care. Follow these winter tips to keep your pet healthy and comfortable during the cooler months.",
+    "banner_image": "winter_banner.jpg",
+    "theme_color": "#4F7CAC",
+    "season_months": "December to February",
+    "tips": [
+      {
+        "title": "Winter Comfort Essentials",
+        "content": "Provide warm bedding in draft-free areas. Consider sweaters for short-haired breeds, seniors, or puppies during early mornings and evenings. Keep indoor temperatures comfortable, especially for older pets.",
+        "image": "winter_comfort.jpg",
+        "icon": "fas fa-home"
+      },
+      {
+        "title": "Skin and Coat Care",
+        "content": "Bangalore's winter can cause dry skin in pets. Brush regularly to distribute natural oils. Consider adding omega fatty acids to their diet. Reduce bath frequency and use moisturizing pet shampoos when needed.",
+        "image": "winter_skin.jpg",
+        "icon": "fas fa-feather"
+      },
+      {
+        "title": "Joint Care for Senior Pets",
+        "content": "Older pets may experience stiffness in cooler weather. Provide orthopedic bedding. Consider joint supplements like glucosamine. Keep them warm and maintain gentle exercise routines to prevent stiffness.",
+        "image": "winter_joints.jpg",
+        "icon": "fas fa-bone"
+      },
+      {
+        "title": "Winter Nutrition Adjustments",
+        "content": "Pets may need slightly more calories in winter to maintain body temperature. Serve room-temperature food rather than cold food from the refrigerator. Ensure fresh water is always available as pets can become dehydrated even in cool weather.",
+        "image": "winter_nutrition.jpg",
+        "icon": "fas fa-drumstick-bite"
+      },
+      {
+        "title": "Bangalore Winter Activities",
+        "content": "Take advantage of pleasant daytime temperatures for longer walks and park visits. Explore pet-friendly outdoor cafes during sunny afternoons. Consider day trips to nearby pet-friendly destinations like Nandi Hills.",
+        "image": "winter_activities.jpg",
+        "icon": "fas fa-sun"
+      }
+    ],
+    "emergency_info": {
+      "title": "Winter Warning Signs",
+      "content": "Watch for signs of respiratory infections which can be more common in winter. Monitor senior pets for increased joint pain or mobility issues. Ensure puppies and older pets don't get too cold during early mornings.",
+      "contact": "Emergency Vet Helpline: 080-2345-6789"
+    }
+  }
+}

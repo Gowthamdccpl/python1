@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Panel - PetCare Companion{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <!-- Header -->
+            <div class="text-center mb-5">
+                <h1 class="display-4 mb-3">
+                    <i class="fas fa-user-shield text-primary me-3"></i>
+                    Admin Panel
+                </h1>
+                <p class="lead text-muted">Manage your pet care platform with administrative tools</p>
+            </div>
+
+            <!-- Admin Options Cards -->
+            <div class="row g-4">
+                <!-- Pet Management Card -->
+                <div class="col-md-6">
+                    <div class="card h-100 shadow-sm border-0 admin-card">
+                        <div class="card-body text-center p-4">
+                            <div class="admin-icon mb-3">
+                                <i class="fas fa-paw fa-3x text-primary"></i>
+                            </div>
+                            <h4 class="card-title mb-3">Pet Management</h4>
+                            <p class="card-text text-muted mb-4">
+                                Add, edit, and manage pets available for adoption. Upload photos, update information, and track adoption status.
+                            </p>
+                            <div class="d-grid gap-2">
+                                <a href="{{ url_for('admin_login') }}" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-sign-in-alt me-2"></i>Access Pet Management
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Analytics Card -->
+                <div class="col-md-6">
+                    <div class="card h-100 shadow-sm border-0 admin-card">
+                        <div class="card-body text-center p-4">
+                            <div class="admin-icon mb-3">
+                                <i class="fas fa-chart-bar fa-3x text-success"></i>
+                            </div>
+                            <h4 class="card-title mb-3">System Analytics</h4>
+                            <p class="card-text text-muted mb-4">
+                                View platform statistics, user engagement metrics, and adoption success rates.
+                            </p>
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-success btn-lg" onclick="showComingSoon()">
+                                    <i class="fas fa-chart-line me-2"></i>View Analytics
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content Management Card -->
+                <div class="col-md-6">
+                    <div class="card h-100 shadow-sm border-0 admin-card">
+                        <div class="card-body text-center p-4">
+                            <div class="admin-icon mb-3">
+                                <i class="fas fa-edit fa-3x text-warning"></i>
+                            </div>
+                            <h4 class="card-title mb-3">Content Management</h4>
+                            <p class="card-text text-muted mb-4">
+                                Update website content, manage seasonal tips, and edit informational pages.
+                            </p>
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-warning btn-lg" onclick="showComingSoon()">
+                                    <i class="fas fa-file-edit me-2"></i>Manage Content
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User Management Card -->
+                <div class="col-md-6">
+                    <div class="card h-100 shadow-sm border-0 admin-card">
+                        <div class="card-body text-center p-4">
+                            <div class="admin-icon mb-3">
+                                <i class="fas fa-users fa-3x text-info"></i>
+                            </div>
+                            <h4 class="card-title mb-3">User Management</h4>
+                            <p class="card-text text-muted mb-4">
+                                Manage user accounts, adoption applications, and appointment requests.
+                            </p>
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-info btn-lg" onclick="showComingSoon()">
+                                    <i class="fas fa-user-cog me-2"></i>Manage Users
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Stats Section -->
+            <div class="row mt-5">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">
+                                <i class="fas fa-tachometer-alt me-2"></i>Quick Platform Overview
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row text-center">
+                                <div class="col-md-3">
+                                    <div class="stat-item">
+                                        <h3 class="text-primary">{{ pets_count if pets_count else '0' }}</h3>
+                                        <p class="text-muted mb-0">Pets Available</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="stat-item">
+                                        <h3 class="text-success">{{ appointments_count if appointments_count else '0' }}</h3>
+                                        <p class="text-muted mb-0">Total Appointments</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="stat-item">
+                                        <h3 class="text-warning">{{ pending_appointments if pending_appointments else '0' }}</h3>
+                                        <p class="text-muted mb-0">Pending Appointments</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="stat-item">
+                                        <h3 class="text-info">156</h3>
+                                        <p class="text-muted mb-0">Total Visitors</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Instructions -->
+            <div class="row mt-5">
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        <h5 class="alert-heading">
+                            <i class="fas fa-info-circle me-2"></i>Admin Access Instructions
+                        </h5>
+                        <p class="mb-2">To access the full admin functionality:</p>
+                        <ol class="mb-0">
+                            <li>Click on "Access Pet Management" above</li>
+                            <li>Login with admin credentials: <strong>Username:</strong> admin, <strong>Password:</strong> admin123</li>
+                            <li>Manage pets, view analytics, and control platform content</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Coming Soon Modal -->
+<div class="modal fade" id="comingSoonModal" tabindex="-1" aria-labelledby="comingSoonModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="comingSoonModalLabel">
+                    <i class="fas fa-rocket me-2"></i>Coming Soon!
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <i class="fas fa-tools fa-3x text-muted mb-3"></i>
+                <h5>Feature Under Development</h5>
+                <p class="text-muted">This feature is currently being developed and will be available in a future update.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .admin-card {
+        transition: all 0.3s ease;
+        border-radius: 15px;
+    }
+
+    .admin-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
+    }
+
+    .admin-icon {
+        background: rgba(0,123,255,0.1);
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+    }
+
+    .stat-item {
+        padding: 1rem;
+        border-radius: 10px;
+        background: rgba(0,0,0,0.02);
+        margin: 0.5rem 0;
+    }
+
+    .stat-item h3 {
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+</style>
+
+<script>
+    function showComingSoon() {
+        const modal = new bootstrap.Modal(document.getElementById('comingSoonModal'));
+        modal.show();
+    }
+</script>
+{% endblock %}

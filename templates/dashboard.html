@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - PetCare Companion{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4 text-center dashboard-title">Pet Food Database Dashboard</h1>
+
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="dashboard-card">
+                <h5 class="dashboard-title">Overview</h5>
+                <p class="card-text">Our database contains <strong>{{ total_records }}</strong> pet food products from <strong>{{ brand_counts|length }}</strong> different brands, covering <strong>{{ life_stage_counts|length }}</strong> life stages and <strong>{{ animal_size_counts|length }}</strong> animal sizes.</p>
+
+                <div class="row mt-4">
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <div class="card bg-primary text-white text-center p-3">
+                            <h2 class="mb-0">{{ total_records }}</h2>
+                            <p class="mb-0">Total Products</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <div class="card bg-success text-white text-center p-3">
+                            <h2 class="mb-0">{{ brand_counts|length }}</h2>
+                            <p class="mb-0">Brands</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <div class="card bg-info text-white text-center p-3">
+                            <h2 class="mb-0">{{ life_stage_counts|length }}</h2>
+                            <p class="mb-0">Life Stages</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <div class="card bg-warning text-white text-center p-3">
+                            <h2 class="mb-0">{{ animal_size_counts|length }}</h2>
+                            <p class="mb-0">Animal Sizes</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="dashboard-card h-100">
+                <h5 class="dashboard-title">Brands Distribution</h5>
+                <div class="table-responsive">
+                    <table class="dashboard-table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Brand</th>
+                                <th>Number of Products</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for brand, count in brand_counts.items()|sort(reverse=true, attribute='1') %}
+                            <tr>
+                                <td>{{ brand }}</td>
+                                <td>{{ count }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="dashboard-card h-100">
+                <h5 class="dashboard-title">Life Stages Distribution</h5>
+                <div class="table-responsive">
+                    <table class="dashboard-table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Life Stage</th>
+                                <th>Number of Products</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for stage, count in life_stage_counts.items()|sort(reverse=true, attribute='1') %}
+                            <tr>
+                                <td>{{ stage }}</td>
+                                <td>{{ count }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="dashboard-card h-100">
+                <h5 class="dashboard-title">Animal Sizes Distribution</h5>
+                <div class="table-responsive">
+                    <table class="dashboard-table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Animal Size</th>
+                                <th>Number of Products</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for size, count in animal_size_counts.items()|sort(reverse=true, attribute='1') %}
+                            <tr>
+                                <td>{{ size }}</td>
+                                <td>{{ count }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="dashboard-card h-100">
+                <h5 class="dashboard-title">Special Conditions</h5>
+                <div class="table-responsive">
+                    <table class="dashboard-table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Condition</th>
+                                <th>Number of Products</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for condition, count in condition_counts.items()|sort(reverse=true, attribute='1') %}
+                            <tr>
+                                <td>{{ condition }}</td>
+                                <td>{{ count }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mb-4">
+        <a href="{{ url_for('food_recommendation') }}" class="btn btn-primary btn-lg">Get Food Recommendations</a>
+    </div>
+</div>
+{% endblock %}

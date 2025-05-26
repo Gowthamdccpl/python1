@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Food Recommendation - PetCare Companion{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h1 class="mb-4 text-center">Pet Food Recommendation</h1>
+
+            <div class="card shadow">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Enter Your Pet's Information</h5>
+
+                    {% if error_message %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ error_message }}
+                    </div>
+                    {% endif %}
+
+                    <form action="{{ url_for('predict') }}" method="POST">
+                        <div class="mb-3">
+                            <label for="type" class="form-label">Pet Type</label>
+                            <select class="form-select" id="type" name="type" required>
+                                <option value="">Select pet type</option>
+                                <option value="dog">Dog</option>
+                                <option value="cat">Cat</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="age" class="form-label">Age (months)</label>
+                            <input type="number" class="form-control" id="age" name="age" min="1" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="weight" class="form-label">Weight (lbs)</label>
+                            <input type="number" class="form-control" id="weight" name="weight" min="1" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="activity" class="form-label">Activity Level</label>
+                            <select class="form-select" id="activity" name="activity" required>
+                                <option value="">Select activity level</option>
+                                <option value="low">Low (Sedentary/Minimal Exercise)</option>
+                                <option value="medium">Medium (Regular Exercise)</option>
+                                <option value="high">High (Very Active/Working Dog)</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Health Conditions (select all that apply)</label>
+                            <div class="card p-3">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="food_allergy" name="health_conditions" value="Food Allergy">
+                                            <label class="form-check-label" for="food_allergy">Food Allergy</label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="sensitive_stomach" name="health_conditions" value="Sensitive Stomach & Skin">
+                                            <label class="form-check-label" for="sensitive_stomach">Sensitive Stomach & Skin</label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="overweight" name="health_conditions" value="Overweight">
+                                            <label class="form-check-label" for="overweight">Overweight</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="joint_care" name="health_conditions" value="Joint Care">
+                                            <label class="form-check-label" for="joint_care">Joint Care</label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="skin_coat" name="health_conditions" value="Skin and Coat Health">
+                                            <label class="form-check-label" for="skin_coat">Skin and Coat Health</label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="digestive_care" name="health_conditions" value="Digestive Care">
+                                            <label class="form-check-label" for="digestive_care">Digestive Care</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Get Recommendations</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="mt-4 text-center">
+                <p class="text-muted">Our AI-powered recommendation system will suggest the best food options for your pet based on their specific needs.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

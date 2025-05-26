@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Location Test</title>
+</head>
+<body>
+    <h1>Location Detection Test</h1>
+    
+    <button onclick="testLocation()">Test GPS Location</button>
+    <button onclick="testDemo()">Test Demo Location</button>
+    
+    <div id="result"></div>
+    
+    <script>
+        function testLocation() {
+            console.log('Testing GPS location...');
+            document.getElementById('result').innerHTML = 'Testing GPS...';
+            
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        document.getElementById('result').innerHTML = `GPS Location: ${lat}, ${lng}`;
+                        console.log('GPS Success:', lat, lng);
+                    },
+                    function(error) {
+                        document.getElementById('result').innerHTML = `GPS Error: ${error.message}`;
+                        console.log('GPS Error:', error);
+                    }
+                );
+            } else {
+                document.getElementById('result').innerHTML = 'Geolocation not supported';
+            }
+        }
+        
+        function testDemo() {
+            console.log('Testing demo location...');
+            document.getElementById('result').innerHTML = 'Demo Location: Koramangala (12.9352, 77.6245)';
+        }
+    </script>
+</body>
+</html>

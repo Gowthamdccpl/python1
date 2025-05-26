@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Appointment Confirmation - PetCare Companion{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card shadow">
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-check-circle text-success fa-5x mb-3"></i>
+                        <h1 class="card-title">Appointment Confirmed!</h1>
+                        <p class="lead">Thank you for booking an appointment with PetCare Companion.</p>
+                    </div>
+
+                    <div class="alert alert-info mb-4">
+                        <p class="mb-0">A confirmation email has been sent to <strong>{{ appointment_data.email }}</strong>. Please check your inbox for details.</p>
+                    </div>
+
+                    <h4 class="mb-3">Appointment Details</h4>
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card bg-light mb-3">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Owner Information</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p class="mb-1"><strong>Name:</strong> {{ appointment_data.owner_name }}</p>
+                                    <p class="mb-1"><strong>Email:</strong> {{ appointment_data.email }}</p>
+                                    <p class="mb-0"><strong>Phone:</strong> {{ appointment_data.phone }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card bg-light mb-3">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Pet Information</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p class="mb-1"><strong>Name:</strong> {{ appointment_data.pet_name }}</p>
+                                    <p class="mb-1"><strong>Type:</strong> {{ appointment_data.pet_type|capitalize }}</p>
+                                    <p class="mb-0"><strong>Age:</strong> {{ appointment_data.pet_age }} {{ appointment_data.age_unit }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card bg-light mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Appointment Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p class="mb-1"><strong>Type:</strong> {{ appointment_data.appointment_type|capitalize }}</p>
+                                    <p class="mb-1"><strong>Date:</strong> {{ appointment_data.appointment_date }}</p>
+                                    <p class="mb-1"><strong>Time:</strong> {{ appointment_data.appointment_time|capitalize }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    {% if appointment_data.notes %}
+                                    <p class="mb-1"><strong>Additional Notes:</strong></p>
+                                    <p class="mb-0">{{ appointment_data.notes }}</p>
+                                    {% else %}
+                                    <p class="mb-0"><strong>Additional Notes:</strong> None</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card bg-light mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">What to Expect</h5>
+                        </div>
+                        <div class="card-body">
+                            <ol class="mb-0">
+                                <li class="mb-2">Please arrive 10-15 minutes before your scheduled appointment time.</li>
+                                <li class="mb-2">Bring any previous medical records or medication your pet is currently taking.</li>
+                                <li class="mb-2">Dogs should be on a leash and cats should be in a carrier.</li>
+                                <li>If you need to cancel or reschedule, please call us at least 24 hours in advance.</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div class="text-center">
+                        <a href="{{ url_for('home') }}" class="btn btn-primary me-2">Return to Home</a>
+                        <a href="#" class="btn btn-outline-primary" onclick="window.print();">Print Confirmation</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

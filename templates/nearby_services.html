@@ -9,6 +9,37 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
+<!-- Custom CSS for animations -->
+<style>
+    @keyframes pulse {
+        0% {
+            transform: scale(1);
+            opacity: 1;
+        }
+        50% {
+            transform: scale(1.2);
+            opacity: 0.7;
+        }
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    .user-location-marker {
+        z-index: 1000;
+    }
+
+    .nearby-service-card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .nearby-service-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+</style>
+
 <!-- Location Detection Script -->
 <script>
     // Initialize map when page loads
@@ -820,81 +851,231 @@
         return col;
     }
 
-    // SIMPLE GPS location detection that WORKS
+    // FIXED GPS location detection
     function getUserLocationWithAPI() {
-        console.log('Getting location...');
+        console.log('🔍 Starting location detection...');
 
         const statusDiv = document.getElementById('locationStatus');
         statusDiv.classList.remove('manual-location-hidden');
         statusDiv.className = 'alert alert-info';
         statusDiv.innerHTML = `
-            <i class="fas fa-spinner fa-spin me-2"></i>
-            <strong>Getting your location...</strong><br>
-            <small>Please allow location access</small>
+            <div class="d-flex align-items-center">
+                <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                <div>
+                    <strong>Detecting your location...</strong><br>
+                    <small>Please click "Allow" when your browser asks for location permission</small>
+                </div>
+            </div>
+            <div class="mt-2">
+                <button type="button" class="btn btn-sm btn-warning" onclick="useDemoLocation()">
+                    Skip & Use Demo Location
+                </button>
+            </div>
         `;
 
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                // SUCCESS
-                function(position) {
-                    console.log('SUCCESS! Got location:', position.coords.latitude, position.coords.longitude);
-
-                    userLatitude = position.coords.latitude;
-                    userLongitude = position.coords.longitude;
-
-                    // Update map
-                    map.setView([userLatitude, userLongitude], 14);
-
-                    // Add simple blue marker
-                    if (userMarker) map.removeLayer(userMarker);
-                    userMarker = L.marker([userLatitude, userLongitude])
-                        .addTo(map)
-                        .bindPopup('Your Location')
-                        .openPopup();
-
-                    // Show location
-                    document.getElementById('currentLocationText').textContent =
-                        `${userLatitude.toFixed(4)}, ${userLongitude.toFixed(4)}`;
-                    document.getElementById('currentLocationDiv').classList.remove('current-location-hidden');
-
-                    // Find services
-                    findNearbyServicesWithLocation();
-
-                    // Hide loading
-                    statusDiv.classList.add('manual-location-hidden');
-
-                    alert('✅ Location detected! Finding nearby services...');
-                },
-                // ERROR
-                function(error) {
-                    console.error('Location error:', error);
-
-                    statusDiv.className = 'alert alert-warning';
-                    statusDiv.innerHTML = `
-                        <i class="fas fa-exclamation-triangle me-2"></i>
-                        <strong>Location access denied or failed</strong><br>
-                        <button type="button" class="btn btn-sm btn-success mt-2" onclick="useDemoLocation()">
-                            Use Demo Location Instead
-                        </button>
-                    `;
-                },
-                // OPTIONS
-                {
-                    enableHighAccuracy: false,
-                    timeout: 10000,
-                    maximumAge: 300000
-                }
-            );
-        } else {
-            statusDiv.className = 'alert alert-danger';
-            statusDiv.innerHTML = `
-                <i class="fas fa-times me-2"></i>
-                <strong>Geolocation not supported</strong><br>
-                <button type="button" class="btn btn-sm btn-success mt-2" onclick="useDemoLocation()">
-                    Use Demo Location
-                </button>
-            `;
+        // Check if geolocation is supported
+        if (!navigator.geolocation) {
+            console.error('❌ Geolocation not supported');
+            showLocationError('Geolocation is not supported by this browser');
+            return;
         }
+
+        console.log('📱 Browser supports geolocation, requesting permission...');
+
+        // Set timeout to prevent hanging
+        const timeoutId = setTimeout(() => {
+            console.log('⏰ Location request timed out');
+            showLocationError('Location request timed out. Please try again or use demo location.');
+        }, 15000);
+
+        navigator.geolocation.getCurrentPosition(
+            // SUCCESS CALLBACK
+            function(position) {
+                clearTimeout(timeoutId);
+
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+                const accuracy = position.coords.accuracy;
+
+                console.log('✅ SUCCESS! Location detected:');
+                console.log('📍 Latitude:', lat);
+                console.log('📍 Longitude:', lng);
+                console.log('🎯 Accuracy:', accuracy, 'meters');
+
+                // Store coordinates
+                userLatitude = lat;
+                userLongitude = lng;
+
+                // Update map view
+                map.setView([lat, lng], 15);
+
+                // Remove existing marker
+                if (userMarker) {
+                    map.removeLayer(userMarker);
+                }
+
+                // Add new marker with custom icon
+                const userIcon = L.divIcon({
+                    className: 'user-location-marker',
+                    html: `
+                        <div style="
+                            width: 20px;
+                            height: 20px;
+                            background: #007bff;
+                            border: 3px solid white;
+                            border-radius: 50%;
+                            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+                            position: relative;
+                        ">
+                            <div style="
+                                position: absolute;
+                                top: -10px;
+                                left: -10px;
+                                width: 40px;
+                                height: 40px;
+                                background: rgba(0,123,255,0.2);
+                                border-radius: 50%;
+                                animation: pulse 2s infinite;
+                            "></div>
+                        </div>
+                    `,
+                    iconSize: [20, 20],
+                    iconAnchor: [10, 10]
+                });
+
+                userMarker = L.marker([lat, lng], { icon: userIcon })
+                    .addTo(map)
+                    .bindPopup(`
+                        <div style="text-align: center;">
+                            <strong>📍 Your Current Location</strong><br>
+                            <small>Accuracy: ±${Math.round(accuracy)}m</small><br>
+                            <small>${lat.toFixed(6)}, ${lng.toFixed(6)}</small>
+                        </div>
+                    `)
+                    .openPopup();
+
+                // Update location display
+                document.getElementById('currentLocationText').textContent =
+                    `📍 ${lat.toFixed(4)}, ${lng.toFixed(4)} (±${Math.round(accuracy)}m)`;
+                document.getElementById('currentLocationDiv').classList.remove('current-location-hidden');
+
+                // Hide loading status
+                statusDiv.classList.add('manual-location-hidden');
+
+                // Get readable address
+                getReadableAddress(lat, lng);
+
+                // Find nearby services
+                findNearbyServicesWithLocation();
+
+                // Show success message
+                showSuccessMessage(`🎯 Location detected successfully! Accuracy: ±${Math.round(accuracy)}m`);
+            },
+            // ERROR CALLBACK
+            function(error) {
+                clearTimeout(timeoutId);
+
+                console.error('❌ Location detection failed:', error);
+                console.error('Error code:', error.code);
+                console.error('Error message:', error.message);
+
+                let errorMessage = '';
+                let suggestion = '';
+
+                switch(error.code) {
+                    case error.PERMISSION_DENIED:
+                        errorMessage = 'Location access was denied';
+                        suggestion = 'Please enable location access in your browser settings and try again';
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        errorMessage = 'Location information is unavailable';
+                        suggestion = 'Please check your internet connection and GPS settings';
+                        break;
+                    case error.TIMEOUT:
+                        errorMessage = 'Location request timed out';
+                        suggestion = 'Please try again or use demo location';
+                        break;
+                    default:
+                        errorMessage = 'Unknown location error occurred';
+                        suggestion = 'Please try demo location instead';
+                }
+
+                showLocationError(errorMessage, suggestion);
+            },
+            // OPTIONS
+            {
+                enableHighAccuracy: true,
+                timeout: 12000,
+                maximumAge: 300000
+            }
+        );
+    }
+
+    // Show location error with retry options
+    function showLocationError(message, suggestion = '') {
+        const statusDiv = document.getElementById('locationStatus');
+        statusDiv.className = 'alert alert-warning';
+        statusDiv.innerHTML = `
+            <div class="mb-2">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <strong>${message}</strong>
+                ${suggestion ? `<br><small>${suggestion}</small>` : ''}
+            </div>
+            <div class="d-flex gap-2 flex-wrap">
+                <button type="button" class="btn btn-sm btn-primary" onclick="getUserLocationWithAPI()">
+                    <i class="fas fa-redo me-1"></i>Try Again
+                </button>
+                <button type="button" class="btn btn-sm btn-success" onclick="useDemoLocation()">
+                    <i class="fas fa-map-pin me-1"></i>Use Demo Location
+                </button>
+                <button type="button" class="btn btn-sm btn-info" onclick="showLocationHelp()">
+                    <i class="fas fa-question-circle me-1"></i>Help
+                </button>
+            </div>
+        `;
+    }
+
+    // Show location help
+    function showLocationHelp() {
+        const statusDiv = document.getElementById('locationStatus');
+        statusDiv.className = 'alert alert-info';
+        statusDiv.innerHTML = `
+            <h6><i class="fas fa-info-circle me-2"></i>How to Enable Location Access:</h6>
+            <ol class="mb-2">
+                <li><strong>Chrome:</strong> Click the location icon in the address bar → Allow</li>
+                <li><strong>Firefox:</strong> Click the shield icon → Allow location access</li>
+                <li><strong>Safari:</strong> Go to Settings → Privacy → Location Services → Enable</li>
+                <li><strong>Mobile:</strong> Enable location in browser settings</li>
+            </ol>
+            <div class="d-flex gap-2">
+                <button type="button" class="btn btn-sm btn-primary" onclick="getUserLocationWithAPI()">
+                    <i class="fas fa-redo me-1"></i>Try Again
+                </button>
+                <button type="button" class="btn btn-sm btn-success" onclick="useDemoLocation()">
+                    <i class="fas fa-map-pin me-1"></i>Use Demo Location
+                </button>
+            </div>
+        `;
+    }
+
+    // Get readable address from coordinates
+    function getReadableAddress(lat, lng) {
+        console.log('🔍 Getting readable address...');
+
+        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`)
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.display_name) {
+                    const address = data.display_name;
+                    document.getElementById('currentLocationText').textContent = address;
+                    console.log('✅ Address found:', address);
+                } else {
+                    console.log('⚠️ No address found, using coordinates');
+                }
+            })
+            .catch(error => {
+                console.error('❌ Address lookup failed:', error);
+            });
     }
 
     // Add user marker to map

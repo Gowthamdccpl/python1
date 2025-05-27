@@ -1638,4 +1638,10 @@ def seasonal_tips():
 if __name__ == "__main__":
     # Initialize database
     init_database()
-    app.run(debug=True)
+
+    # Get port from environment variable for production deployment
+    import os
+    port = int(os.environ.get('PORT', 5000))
+
+    # Run app with production settings
+    app.run(host='0.0.0.0', port=port, debug=False)

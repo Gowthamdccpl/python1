@@ -1,0 +1,13 @@
+version: '3.8'
+services:
+  petcare-app:
+    build: .
+    container_name: petcare_app
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_APP=app.py
+      - FLASK_RUN_HOST=0.0.0.0
+    volumes:
+      - .:/app
+    restart: unless-stopped

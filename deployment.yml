@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: petcare-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: petcare
+  template:
+    metadata:
+      labels:
+        app: petcare
+    spec:
+      containers:
+      - name: petcare-container
+        image: gowthamkumarks/petcare-app:latest
+        ports:
+        - containerPort: 5000
+        env:
+        - name: FLASK_APP
+          value: "app.py"
+        - name: FLASK_RUN_HOST
+          value: "0.0.0.0"
+        - name: PORT
+          value: "5000"
+        - name: FLASK_ENV
+          value: "production"
+        - name: SECRET_KEY
+          value: "b7e2c1a4f5d8e9c0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4"
